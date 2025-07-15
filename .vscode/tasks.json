@@ -1,0 +1,74 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ESP-IDF: Build",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["build"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$espIdf"],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP-IDF: Clean",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["clean"],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP-IDF: Flash",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["flash"],
+            "group": "build",
+            "dependsOn": "ESP-IDF: Build",
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP-IDF: Monitor",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["monitor"],
+            "group": "test",
+            "isBackground": true,
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP-IDF: Flash and Monitor",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["flash", "monitor"],
+            "group": "build",
+            "dependsOn": "ESP-IDF: Build",
+            "isBackground": true,
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP-IDF: Set Target ESP32-S3",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["set-target", "esp32s3"],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP-IDF: Menuconfig",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["menuconfig"],
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

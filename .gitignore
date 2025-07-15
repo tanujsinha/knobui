@@ -1,0 +1,35 @@
+# ESP-IDF build artifacts
+build/
+sdkconfig
+sdkconfig.old
+
+# VS Code settings (keep tasks and launch configs)
+.vscode/c_cpp_properties.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp

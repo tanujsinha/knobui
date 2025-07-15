@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c"
+    },
+    "C_Cpp.default.compilerPath": "${config:idf.toolsPath}/tools/xtensa-esp32s3-elf/esp-2022r1-11.2.0/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.cppStandard": "c++17",
+    "files.exclude": {
+        "build/": true,
+        "sdkconfig.old": true
+    },
+    "search.exclude": {
+        "build/": true
+    }
+}

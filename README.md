@@ -1,10 +1,33 @@
-# ESP32-S3 Knob Touch LCD Project
+# ESP32-S3 Haptic Counter with LVGL
 
-A bare-bones ESP-IDF project for the **Waveshare ESP32-S3-Knob-Touch-LCD-1.8** development board that displays a simple test message on the LCD screen.
+A sophisticated counter/timer application for the Waveshare ESP32-S3-Knob-Touch-LCD-1.8 development board featuring haptic feedback, rotary encoder input, and a colorful LVGL interface.
 
-## 🚀 Quick Start
+## 🚀 Features
+
+- **Interactive Counter**: Increment/decrement with rotary encoder
+- **Haptic Feedback**: DRV2605 vibration motor driver integration
+- **Color Selection**: 6 customizable background colors (White, Black, Green, Red, Blue, Yellow)
+- **Brightness Control**: Adjustable LCD backlight with PWM
+- **Touch Support**: Capacitive touch controller (CST816) ready
+- **LVGL Interface**: Modern circular UI with 360x360 display
+- **Real-time Updates**: Smooth animations and responsive controls
+
+## 🔧 Hardware Requirements
+
+### ESP32-S3-Knob-Touch-LCD-1.8 Specifications
+- **MCU**: ESP32-S3 (dual-core, Wi-Fi, Bluetooth)
+- **Display**: 1.8" LCD with 360x360 resolution
+- **Touch**: Capacitive touch controller (CST816)
+- **Audio**: PCM5100A audio codec with 3.5mm jack
+- **Input**: Rotary encoder with push button
+- **Haptic**: DRV2605 vibration motor driver
+- **Storage**: MicroSD card slot
+- **Power**: USB-C, battery connector (PH1.25)
+
+## 🛠️ Development Setup
 
 ### Prerequisites
+- **ESP-IDF v5.2+** installed
 - **VS Code** with **ESP-IDF Extension**
 - **ESP32-S3-Knob-Touch-LCD-1.8** board
 - **USB-C cable**

@@ -516,6 +516,11 @@ static void timer_touch_cb(lv_event_t * e)
 
 static bool check_swipe_gesture(lv_event_code_t code)
 {
+    // Only allow swipe gestures on the main screen (no menus open)
+    if (main_menu_open || brightness_menu_open || color_menu_open || timer_setting_mode) {
+        return false;
+    }
+    
     if (code == LV_EVENT_PRESSED) {
         // Touch started - record position and time
         lv_indev_t * indev = lv_indev_get_act();
@@ -708,26 +713,19 @@ static void show_brightness_menu(void)
     lv_obj_clear_flag(brightness_menu, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_event_cb(brightness_menu, brightness_menu_close_cb, LV_EVENT_ALL, NULL);
     
-    // Create title label
-    brightness_title_label = lv_label_create(brightness_menu);
-    lv_label_set_text(brightness_title_label, "Brightness");
-    lv_obj_set_style_text_color(brightness_title_label, lv_color_white(), LV_PART_MAIN);
-    lv_obj_set_style_text_font(brightness_title_label, &lv_font_montserrat_20, LV_PART_MAIN);
-    lv_obj_align(brightness_title_label, LV_ALIGN_TOP_MID, 0, 30);
-    
-    // Create circular background
+    // Create circular background - increased size by 20% (200 -> 240)
     brightness_circle = lv_obj_create(brightness_menu);
-    lv_obj_set_size(brightness_circle, 200, 200);
+    lv_obj_set_size(brightness_circle, 240, 240);
     lv_obj_center(brightness_circle);
-    lv_obj_set_style_radius(brightness_circle, 100, LV_PART_MAIN);
+    lv_obj_set_style_radius(brightness_circle, 120, LV_PART_MAIN);
     lv_obj_set_style_bg_color(brightness_circle, lv_color_hex(0x333333), LV_PART_MAIN);
     lv_obj_set_style_border_color(brightness_circle, lv_color_hex(0x666666), LV_PART_MAIN);
     lv_obj_set_style_border_width(brightness_circle, 2, LV_PART_MAIN);
     lv_obj_clear_flag(brightness_circle, LV_OBJ_FLAG_SCROLLABLE);
     
-    // Create arc for brightness level visualization
+    // Create arc for brightness level visualization - increased size by 20% (180 -> 216)
     brightness_arc = lv_arc_create(brightness_menu);
-    lv_obj_set_size(brightness_arc, 180, 180);
+    lv_obj_set_size(brightness_arc, 216, 216);
     lv_obj_center(brightness_arc);
     lv_arc_set_range(brightness_arc, 0, 255);
     lv_arc_set_value(brightness_arc, brightness_level);
@@ -746,13 +744,7 @@ static void show_brightness_menu(void)
     lv_obj_set_style_text_align(brightness_percentage_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
     lv_obj_center(brightness_percentage_label);
     
-    // Create instructions label
-    lv_obj_t *instructions_label = lv_label_create(brightness_menu);
-    lv_label_set_text(instructions_label, "Rotate to adjust\nPress to exit");
-    lv_obj_set_style_text_color(instructions_label, lv_color_hex(0xAAAAAA), LV_PART_MAIN);
-    lv_obj_set_style_text_font(instructions_label, &lv_font_montserrat_14, LV_PART_MAIN);
-    lv_obj_set_style_text_align(instructions_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_align(instructions_label, LV_ALIGN_BOTTOM_MID, 0, -30);
+    // Remove instruction text as requested
     
     update_brightness_display();
     
@@ -767,7 +759,6 @@ static void hide_brightness_menu(void)
         brightness_circle = NULL;
         brightness_arc = NULL;
         brightness_percentage_label = NULL;
-        brightness_title_label = NULL;
     }
     brightness_menu_open = false;
     ESP_LOGI(TAG, "Brightness menu closed");
@@ -808,30 +799,31 @@ static void show_color_menu(void)
     
     color_menu_open = true;
     
-    // Create color menu container - ensure perfect centering
+    // Create color menu container - match brightness menu style
     color_menu = lv_obj_create(lv_scr_act());
     lv_obj_set_size(color_menu, 360, 360);
-    lv_obj_set_pos(color_menu, 0, 0);  // Position at exact screen coordinates
+    lv_obj_center(color_menu);
     lv_obj_set_style_bg_color(color_menu, lv_color_hex(0x000000), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(color_menu, 220, LV_PART_MAIN); // Semi-transparent
     lv_obj_set_style_border_opa(color_menu, 0, LV_PART_MAIN);
     lv_obj_set_style_radius(color_menu, 20, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(color_menu, 0, LV_PART_MAIN);  // Remove all padding
     lv_obj_clear_flag(color_menu, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_event_cb(color_menu, color_menu_close_cb, LV_EVENT_ALL, NULL);
     
-    // Create title label - positioned manually for perfect centering
-    color_title_label = lv_label_create(color_menu);
-    lv_label_set_text(color_title_label, "Color Selection");
-    lv_obj_set_style_text_color(color_title_label, lv_color_white(), LV_PART_MAIN);
-    lv_obj_set_style_text_font(color_title_label, &lv_font_montserrat_14, LV_PART_MAIN);
-    lv_obj_set_style_text_align(color_title_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(color_title_label, 180 - 50, 20);  // Center horizontally, 20px from top
+    // Create circular background - same size as brightness menu
+    lv_obj_t *color_circle = lv_obj_create(color_menu);
+    lv_obj_set_size(color_circle, 240, 240);
+    lv_obj_center(color_circle);
+    lv_obj_set_style_radius(color_circle, 120, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(color_circle, lv_color_hex(0x333333), LV_PART_MAIN);
+    lv_obj_set_style_border_color(color_circle, lv_color_hex(0x666666), LV_PART_MAIN);
+    lv_obj_set_style_border_width(color_circle, 2, LV_PART_MAIN);
+    lv_obj_clear_flag(color_circle, LV_OBJ_FLAG_SCROLLABLE);
     
-    // Create center select button - perfectly centered
+    // Create center select button
     color_center_button = lv_btn_create(color_menu);
     lv_obj_set_size(color_center_button, 80, 80);
-    lv_obj_set_pos(color_center_button, 140, 140);  // Exact center: (360-80)/2 = 140
+    lv_obj_center(color_center_button);
     lv_obj_set_style_bg_color(color_center_button, lv_color_hex(0x444444), LV_PART_MAIN);
     lv_obj_set_style_radius(color_center_button, 40, LV_PART_MAIN); // Circular
     lv_obj_add_event_cb(color_center_button, color_menu_select_cb, LV_EVENT_ALL, NULL);
@@ -842,37 +834,41 @@ static void show_color_menu(void)
     lv_obj_set_style_text_font(select_label, &lv_font_montserrat_12, LV_PART_MAIN);
     lv_obj_center(select_label);
     
-    // Create color bubbles in a circle along the outer ring of the screen
-    // Radius from center for color bubbles - positioned near screen edge
-    int radius = 140;  // Larger radius to place near screen edge
+    // Create color segments around the circular bar
     lv_coord_t center_x = 180; // Half of 360
     lv_coord_t center_y = 180; // Half of 360
+    int segment_angle = 60; // 360 degrees / 6 colors
     
     for (int i = 0; i < 6; i++) {
-        // Calculate position around circle (60 degrees apart, starting at top)
-        float angle = (i * 60 - 90) * M_PI / 180.0f; // -90 to start at top instead of right
-        lv_coord_t x = center_x + (lv_coord_t)(radius * cosf(angle)) - 30; // -30 to center the 60px bubble
-        lv_coord_t y = center_y + (lv_coord_t)(radius * sinf(angle)) - 30; // -30 to center the 60px bubble
+        // Create arc segments for each color
+        lv_obj_t *color_arc = lv_arc_create(color_menu);
+        lv_obj_set_size(color_arc, 216, 216);
+        lv_obj_center(color_arc);
         
-        // Create color bubble - positioned on outer ring
-        color_bubbles[i] = lv_obj_create(color_menu);
-        lv_obj_set_size(color_bubbles[i], 60, 60);  // Large bubbles for easy selection
-        lv_obj_set_pos(color_bubbles[i], x, y);
-        lv_obj_set_style_radius(color_bubbles[i], 30, LV_PART_MAIN); // Circular
-        lv_obj_set_style_bg_color(color_bubbles[i], color_values[i], LV_PART_MAIN);
-        lv_obj_set_style_border_width(color_bubbles[i], 4, LV_PART_MAIN);  // Thicker border
-        lv_obj_clear_flag(color_bubbles[i], LV_OBJ_FLAG_SCROLLABLE);
+        // Set arc angles for each segment (60 degrees each)
+        int start_angle = i * segment_angle - 90; // Start at top (-90 degrees)
+        int end_angle = start_angle + segment_angle;
         
-        // No color name labels - removed as requested
+        lv_arc_set_bg_angles(color_arc, 0, 360); // Background full circle
+        lv_arc_set_angles(color_arc, start_angle, end_angle);
+        lv_arc_set_range(color_arc, 0, 100);
+        lv_arc_set_value(color_arc, 100); // Full segment
+        
+        // Set segment colors
+        lv_obj_set_style_arc_color(color_arc, color_values[i], LV_PART_INDICATOR);
+        lv_obj_set_style_arc_color(color_arc, lv_color_hex(0x333333), LV_PART_MAIN);
+        lv_obj_set_style_arc_width(color_arc, 16, LV_PART_INDICATOR);
+        lv_obj_set_style_arc_width(color_arc, 16, LV_PART_MAIN);
+        
+        // Remove the knob
+        lv_obj_remove_style(color_arc, NULL, LV_PART_KNOB);
+        lv_obj_clear_flag(color_arc, LV_OBJ_FLAG_CLICKABLE);
+        
+        // Store reference for highlighting
+        color_bubbles[i] = color_arc;
     }
     
-    // Create instructions label - positioned manually at bottom
-    lv_obj_t *instructions_label = lv_label_create(color_menu);
-    lv_label_set_text(instructions_label, "Rotate to select • Press center to apply");
-    lv_obj_set_style_text_color(instructions_label, lv_color_hex(0xAAAAAA), LV_PART_MAIN);
-    lv_obj_set_style_text_font(instructions_label, &lv_font_montserrat_12, LV_PART_MAIN);
-    lv_obj_set_style_text_align(instructions_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(instructions_label, 180 - 120, 320);  // Center horizontally, 20px from bottom
+    // Remove instruction text as requested
     
     update_color_selection();
     
@@ -885,9 +881,8 @@ static void hide_color_menu(void)
         lv_obj_del(color_menu);
         color_menu = NULL;
         color_center_button = NULL;
-        color_title_label = NULL;
         
-        // Clear color bubble references
+        // Clear color segment references
         for (int i = 0; i < 6; i++) {
             color_bubbles[i] = NULL;
         }
@@ -901,16 +896,16 @@ static void update_color_selection(void)
     for (int i = 0; i < 6; i++) {
         if (color_bubbles[i] != NULL) {
             if (i == selected_color_index) {
-                // Highlight selected color with white border and slight glow
-                lv_obj_set_style_border_color(color_bubbles[i], lv_color_white(), LV_PART_MAIN);
-                lv_obj_set_style_border_width(color_bubbles[i], 4, LV_PART_MAIN);
+                // Highlight selected color segment with thicker arc and brighter color
+                lv_obj_set_style_arc_width(color_bubbles[i], 24, LV_PART_INDICATOR); // Thicker
+                lv_obj_set_style_arc_color(color_bubbles[i], color_values[i], LV_PART_INDICATOR);
                 lv_obj_set_style_shadow_color(color_bubbles[i], lv_color_white(), LV_PART_MAIN);
-                lv_obj_set_style_shadow_width(color_bubbles[i], 10, LV_PART_MAIN);
+                lv_obj_set_style_shadow_width(color_bubbles[i], 8, LV_PART_MAIN);
                 lv_obj_set_style_shadow_opa(color_bubbles[i], LV_OPA_50, LV_PART_MAIN);
             } else {
                 // Normal appearance
-                lv_obj_set_style_border_color(color_bubbles[i], lv_color_hex(0x666666), LV_PART_MAIN);
-                lv_obj_set_style_border_width(color_bubbles[i], 2, LV_PART_MAIN);
+                lv_obj_set_style_arc_width(color_bubbles[i], 16, LV_PART_INDICATOR); // Normal thickness
+                lv_obj_set_style_arc_color(color_bubbles[i], color_values[i], LV_PART_INDICATOR);
                 lv_obj_set_style_shadow_width(color_bubbles[i], 0, LV_PART_MAIN);
                 lv_obj_set_style_shadow_opa(color_bubbles[i], LV_OPA_TRANSP, LV_PART_MAIN);
             }
@@ -1042,26 +1037,31 @@ static void update_timer_display(void)
     }
 }
 
-// Timer setting popup functions
 static void popup_close_cb(lv_event_t * e)
 {
-    ESP_LOGI(TAG, "Timer setting popup closed - applying new time: %lu minutes", timer_setting_minutes);
+    lv_event_code_t code = lv_event_get_code(e);
     
-    // Clear any active alarm when setting new timer
-    stop_timer_alarm();
-    
-    // Apply the new timer setting
-    timer_seconds = timer_setting_minutes * 60;
-    timer_start_time = 0;
-    timer_elapsed_total = 0;
-    
-    // Hide popup and exit timer setting mode
-    hide_timer_setting_popup();
-    timer_setting_mode = false;
-    encoder_in_timer_mode = false;
-    
-    // Update timer display
-    update_timer_display();
+    if (code == LV_EVENT_CLICKED) {
+        ESP_LOGI(TAG, "Timer setting popup closed - applying new time: %lu minutes", timer_setting_minutes);
+        
+        // Clear any active alarm when setting new timer
+        stop_timer_alarm();
+        
+        // Apply the new timer setting
+        timer_seconds = timer_setting_minutes * 60;
+        timer_start_time = 0;
+        timer_elapsed_total = 0;
+        
+        // Hide popup and exit timer setting mode
+        hide_timer_setting_popup();
+        timer_setting_mode = false;
+        encoder_in_timer_mode = false;
+        
+        // Update timer display
+        update_timer_display();
+        
+        haptic_feedback_short();
+    }
 }
 
 static void show_timer_setting_popup(void)
@@ -1070,40 +1070,54 @@ static void show_timer_setting_popup(void)
     encoder_in_timer_mode = true;
     timer_setting_minutes = timer_seconds / 60; // Set current timer value
     
-    // Create circular popup container
+    // Create timer menu container - match brightness menu style
     timer_popup = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(timer_popup, 300, 300); // Circular size
+    lv_obj_set_size(timer_popup, 360, 360);
     lv_obj_center(timer_popup);
-    lv_obj_set_style_bg_color(timer_popup, lv_color_hex(0x222222), LV_PART_MAIN);
-    lv_obj_set_style_border_color(timer_popup, lv_color_hex(0x00FF00), LV_PART_MAIN);
-    lv_obj_set_style_border_width(timer_popup, 4, LV_PART_MAIN);
-    lv_obj_set_style_radius(timer_popup, 150, LV_PART_MAIN); // Make it circular (radius = half of size)
-    lv_obj_set_style_shadow_width(timer_popup, 20, LV_PART_MAIN);
-    lv_obj_set_style_shadow_color(timer_popup, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(timer_popup, lv_color_hex(0x000000), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(timer_popup, 220, LV_PART_MAIN); // Semi-transparent
+    lv_obj_set_style_border_opa(timer_popup, 0, LV_PART_MAIN);
+    lv_obj_set_style_radius(timer_popup, 20, LV_PART_MAIN);
+    lv_obj_clear_flag(timer_popup, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(timer_popup, popup_close_cb, LV_EVENT_ALL, NULL);
     
-    // Create large timer setting display label in the center
+    // Create circular background - same size as brightness menu
+    lv_obj_t *timer_circle = lv_obj_create(timer_popup);
+    lv_obj_set_size(timer_circle, 240, 240);
+    lv_obj_center(timer_circle);
+    lv_obj_set_style_radius(timer_circle, 120, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(timer_circle, lv_color_hex(0x333333), LV_PART_MAIN);
+    lv_obj_set_style_border_color(timer_circle, lv_color_hex(0x00FF00), LV_PART_MAIN);
+    lv_obj_set_style_border_width(timer_circle, 2, LV_PART_MAIN);
+    lv_obj_clear_flag(timer_circle, LV_OBJ_FLAG_SCROLLABLE);
+    
+    // Create arc for timer visualization - same size as brightness menu
+    lv_obj_t *timer_arc = lv_arc_create(timer_popup);
+    lv_obj_set_size(timer_arc, 216, 216);
+    lv_obj_center(timer_arc);
+    lv_arc_set_range(timer_arc, 1, 60); // 1 to 60 minutes
+    lv_arc_set_value(timer_arc, timer_setting_minutes);
+    lv_arc_set_bg_angles(timer_arc, 0, 360);
+    lv_obj_set_style_arc_color(timer_arc, lv_color_hex(0x00FF00), LV_PART_INDICATOR); // Green
+    lv_obj_set_style_arc_color(timer_arc, lv_color_hex(0x444444), LV_PART_MAIN);
+    lv_obj_set_style_arc_width(timer_arc, 8, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(timer_arc, 8, LV_PART_MAIN);
+    lv_obj_remove_style(timer_arc, NULL, LV_PART_KNOB); // Hide the knob
+    lv_obj_clear_flag(timer_arc, LV_OBJ_FLAG_CLICKABLE);
+    
+    // Create timer setting display label in the center
     timer_set_label = lv_label_create(timer_popup);
-    lv_obj_set_style_text_color(timer_set_label, lv_color_hex(0x00FF00), LV_PART_MAIN);
-    lv_obj_set_style_text_font(timer_set_label, &lv_font_montserrat_48, LV_PART_MAIN);
+    lv_obj_set_style_text_color(timer_set_label, lv_color_white(), LV_PART_MAIN);
+    lv_obj_set_style_text_font(timer_set_label, &lv_font_montserrat_32, LV_PART_MAIN);
     lv_obj_set_style_text_align(timer_set_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
     lv_obj_center(timer_set_label);
     update_timer_setting_display();
     
-    // Make the timer display label clickable for long press
-    lv_obj_add_flag(timer_set_label, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_event_cb(timer_set_label, popup_close_cb, LV_EVENT_LONG_PRESSED, NULL);
+    // Remove instruction text as requested
     
-    // Create small instruction label at the bottom of the circle
-    lv_obj_t *instr_label = lv_label_create(timer_popup);
-    lv_label_set_text(instr_label, "Turn dial to adjust\nLong press to set");
-    lv_obj_set_style_text_color(instr_label, lv_color_hex(0xAAAAAA), LV_PART_MAIN);
-    lv_obj_set_style_text_font(instr_label, &lv_font_montserrat_12, LV_PART_MAIN);
-    lv_obj_set_style_text_align(instr_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_align(instr_label, LV_ALIGN_BOTTOM_MID, 0, -20);
-    
-    // Add long press event to close popup
+    // Make the timer popup clickable for tap to close (instead of long press)
     lv_obj_add_flag(timer_popup, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_event_cb(timer_popup, popup_close_cb, LV_EVENT_LONG_PRESSED, NULL);
+    lv_obj_add_event_cb(timer_popup, popup_close_cb, LV_EVENT_CLICKED, NULL);
 }
 
 static void hide_timer_setting_popup(void)

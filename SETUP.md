@@ -52,9 +52,21 @@ idf.py build
 
 ### 3. Flash to Device
 Connect your ESP32-S3 board via USB-C, then:
+
+**🔧 NEW: Reliable Flash Method (Recommended)**
 ```powershell
-idf.py flash
+.\flash-fix.ps1
 ```
+
+**Or use VS Code Task:**
+- `Ctrl+Shift+P` → `Tasks: Run Task` → `ESP-IDF: Flash (Reliable)`
+
+**Or manual command:**
+```powershell
+idf.py -b 115200 flash
+```
+
+**💡 Tip**: If flashing fails, hold BOOT button while connecting USB-C
 
 ### 4. Monitor Serial Output
 ```powershell
@@ -109,10 +121,21 @@ idf.py flash monitor
 - Try `idf.py clean` then `idf.py build`
 
 ### Flash Errors
-- Check USB cable and connection
-- Try different USB-C orientations
-- Ensure device drivers are installed
-- Hold BOOT button if necessary during flashing
+**🔧 NEW: Most flash errors are now fixed with our reliable flash script!**
+
+Try these solutions in order:
+1. **Use reliable flash script**: `.\flash-fix.ps1`
+2. **Hold BOOT button** while connecting USB-C
+3. **Try lower baud rate**: `idf.py -b 115200 flash`
+4. **Check USB cable** - some cables are power-only
+5. **Try different USB port** - USB 3.0 sometimes has issues
+6. **Restart VS Code** if COM port seems locked
+
+**Common issues fixed:**
+- Wrong flash size (was 16MB, now 8MB)
+- High baud rate timeouts (now 115200)
+- Partition table too big (now 7MB)
+- No bootloader mode detection
 
 ### No Display Output
 - Verify GPIO pin assignments match your board

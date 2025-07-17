@@ -27,6 +27,38 @@
             "problemMatcher": []
         },
         {
+            "label": "ESP-IDF: Flash (Reliable)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}\\flash-fix.ps1"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP-IDF: Flash Low Baud",
+            "type": "shell",
+            "command": "idf.py",
+            "args": ["-b", "115200", "flash"],
+            "group": "build",
+            "dependsOn": "ESP-IDF: Build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "ESP-IDF: Flash",
             "type": "shell",
             "command": "idf.py",

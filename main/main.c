@@ -56,11 +56,13 @@ static void show_brightness_menu(void);
 static void hide_brightness_menu(void);
 static void update_brightness_display(void);
 static void brightness_menu_close_cb(lv_event_t * e);
+static void brightness_circle_click_cb(lv_event_t * e);
 static void show_color_menu(void);
 static void hide_color_menu(void);
 static void update_color_selection(void);
 static void color_menu_select_cb(lv_event_t * e);
 static void color_menu_close_cb(lv_event_t * e);
+static void color_circle_click_cb(lv_event_t * e);
 
 static bool check_swipe_gesture(lv_event_code_t code);
 
@@ -80,6 +82,8 @@ static lv_obj_t *timer_touch_area = NULL;
 // Timer setting popup variables
 static lv_obj_t *timer_popup = NULL;
 static lv_obj_t *timer_set_label = NULL;
+static lv_obj_t *timer_arc = NULL;
+static lv_obj_t *timer_circle = NULL;
 static bool timer_setting_mode = false;
 static uint32_t timer_setting_minutes = 50; // Default 50 minutes
 static bool encoder_in_timer_mode = false;
@@ -90,12 +94,9 @@ static lv_obj_t *alarm_message_label = NULL;
 static esp_timer_handle_t alarm_timer_handle = NULL;
 
 // Match counter variables
-static lv_obj_t *match_me_label = NULL;
-static lv_obj_t *match_draw_label = NULL;
-static lv_obj_t *match_opp_label = NULL;
-static lv_obj_t *match_me_count = NULL;
-static lv_obj_t *match_draw_count = NULL;
-static lv_obj_t *match_opp_count = NULL;
+static lv_obj_t *match_circle_1 = NULL;
+static lv_obj_t *match_circle_2 = NULL;
+static lv_obj_t *match_circle_3 = NULL;
 static lv_obj_t *match_touch_area = NULL;
 static lv_obj_t *match_popup = NULL;
 static bool match_popup_open = false;
@@ -138,14 +139,14 @@ static int selected_color_index = 0;  // Current selected color (0-5)
 static lv_obj_t *color_bubbles[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 static lv_obj_t *color_center_button = NULL;
 static lv_obj_t *color_title_label = NULL;
-static const char* color_names[] = {"White", "Black", "Green", "Red", "Blue", "Yellow"};
+static const char* color_names[] = {"Dark Red", "Dark Green", "Orange", "Blue", "Light Olive", "Dark Purple"};
 static lv_color_t color_values[] = {
-    {.full = 0xFFFF},  // WHITE
-    {.full = 0x0000},  // BLACK
-    {.full = 0x07E0},  // GREEN
-    {.full = 0xF800},  // RED
-    {.full = 0x001F},  // BLUE
-    {.full = 0xFFE0}   // YELLOW
+    LV_COLOR_MAKE(0xbb, 0x1a, 0x22),  // #bb1a22 - Dark Red
+    LV_COLOR_MAKE(0x06, 0x72, 0x43),  // #067243 - Dark Green  
+    LV_COLOR_MAKE(0xcb, 0x7f, 0x24),  // #cb7f24 - Orange
+    LV_COLOR_MAKE(0x38, 0x83, 0xc5),  // #3883c5 - Blue
+    LV_COLOR_MAKE(0xec, 0xee, 0xdc),  // #eceedc - Light Olive
+    LV_COLOR_MAKE(0x1c, 0x0f, 0x3b)   // #1c0f3b - Dark Purple
 };
 
 // Swipe detection variables
@@ -711,21 +712,23 @@ static void show_brightness_menu(void)
     lv_obj_set_style_border_opa(brightness_menu, 0, LV_PART_MAIN);
     lv_obj_set_style_radius(brightness_menu, 20, LV_PART_MAIN);
     lv_obj_clear_flag(brightness_menu, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_event_cb(brightness_menu, brightness_menu_close_cb, LV_EVENT_ALL, NULL);
+    // Remove background click event - only circle should be clickable
     
-    // Create circular background - increased size by 20% (200 -> 240)
+    // Create circular background - same size as Match menu (320x320)
     brightness_circle = lv_obj_create(brightness_menu);
-    lv_obj_set_size(brightness_circle, 240, 240);
+    lv_obj_set_size(brightness_circle, 320, 320);
     lv_obj_center(brightness_circle);
-    lv_obj_set_style_radius(brightness_circle, 120, LV_PART_MAIN);
+    lv_obj_set_style_radius(brightness_circle, 160, LV_PART_MAIN);
     lv_obj_set_style_bg_color(brightness_circle, lv_color_hex(0x333333), LV_PART_MAIN);
     lv_obj_set_style_border_color(brightness_circle, lv_color_hex(0x666666), LV_PART_MAIN);
     lv_obj_set_style_border_width(brightness_circle, 2, LV_PART_MAIN);
     lv_obj_clear_flag(brightness_circle, LV_OBJ_FLAG_SCROLLABLE);
+    // Make only the circle clickable for tap-to-close
+    lv_obj_add_event_cb(brightness_circle, brightness_circle_click_cb, LV_EVENT_CLICKED, NULL);
     
-    // Create arc for brightness level visualization - increased size by 20% (180 -> 216)
+    // Create arc for brightness level visualization - same size as Match menu (296x296)
     brightness_arc = lv_arc_create(brightness_menu);
-    lv_obj_set_size(brightness_arc, 216, 216);
+    lv_obj_set_size(brightness_arc, 296, 296);
     lv_obj_center(brightness_arc);
     lv_arc_set_range(brightness_arc, 0, 255);
     lv_arc_set_value(brightness_arc, brightness_level);
@@ -792,6 +795,17 @@ static void brightness_menu_close_cb(lv_event_t * e)
     }
 }
 
+static void brightness_circle_click_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    
+    if (code == LV_EVENT_CLICKED) {
+        ESP_LOGI(TAG, "Brightness circle clicked - closing menu");
+        haptic_feedback_short();
+        hide_brightness_menu();
+    }
+}
+
 // Color menu functions
 static void show_color_menu(void)
 {
@@ -808,17 +822,19 @@ static void show_color_menu(void)
     lv_obj_set_style_border_opa(color_menu, 0, LV_PART_MAIN);
     lv_obj_set_style_radius(color_menu, 20, LV_PART_MAIN);
     lv_obj_clear_flag(color_menu, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_event_cb(color_menu, color_menu_close_cb, LV_EVENT_ALL, NULL);
+    // Remove background click event - only circle should be clickable
     
-    // Create circular background - same size as brightness menu
+    // Create circular background - same size as Match menu (320x320)
     lv_obj_t *color_circle = lv_obj_create(color_menu);
-    lv_obj_set_size(color_circle, 240, 240);
+    lv_obj_set_size(color_circle, 320, 320);
     lv_obj_center(color_circle);
-    lv_obj_set_style_radius(color_circle, 120, LV_PART_MAIN);
+    lv_obj_set_style_radius(color_circle, 160, LV_PART_MAIN);
     lv_obj_set_style_bg_color(color_circle, lv_color_hex(0x333333), LV_PART_MAIN);
     lv_obj_set_style_border_color(color_circle, lv_color_hex(0x666666), LV_PART_MAIN);
     lv_obj_set_style_border_width(color_circle, 2, LV_PART_MAIN);
     lv_obj_clear_flag(color_circle, LV_OBJ_FLAG_SCROLLABLE);
+    // Make only the circle clickable for tap-to-close
+    lv_obj_add_event_cb(color_circle, color_circle_click_cb, LV_EVENT_CLICKED, NULL);
     
     // Create center select button
     color_center_button = lv_btn_create(color_menu);
@@ -834,41 +850,53 @@ static void show_color_menu(void)
     lv_obj_set_style_text_font(select_label, &lv_font_montserrat_12, LV_PART_MAIN);
     lv_obj_center(select_label);
     
-    // Create color segments around the circular bar
-    lv_coord_t center_x = 180; // Half of 360
-    lv_coord_t center_y = 180; // Half of 360
-    int segment_angle = 60; // 360 degrees / 6 colors
+    // Create a single background arc for the full circle
+    lv_obj_t *background_arc = lv_arc_create(color_menu);
+    lv_obj_set_size(background_arc, 296, 296);
+    lv_obj_center(background_arc);
+    lv_arc_set_range(background_arc, 0, 360);
+    lv_arc_set_value(background_arc, 360);
+    lv_arc_set_bg_angles(background_arc, 0, 360);
+    lv_arc_set_angles(background_arc, 0, 360);
+    lv_obj_set_style_arc_color(background_arc, lv_color_hex(0x222222), LV_PART_MAIN);
+    lv_obj_set_style_arc_color(background_arc, lv_color_hex(0x222222), LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(background_arc, 8, LV_PART_MAIN);
+    lv_obj_set_style_arc_width(background_arc, 8, LV_PART_INDICATOR);
+    lv_obj_remove_style(background_arc, NULL, LV_PART_KNOB);
+    lv_obj_clear_flag(background_arc, LV_OBJ_FLAG_CLICKABLE);
     
+    // Create individual color arcs with double-sized gaps
+    // 360 degrees / 6 colors = 60 degrees per section
+    // Use 50 degrees for color, 10 degrees for gap (doubled from 5)
     for (int i = 0; i < 6; i++) {
-        // Create arc segments for each color
         lv_obj_t *color_arc = lv_arc_create(color_menu);
-        lv_obj_set_size(color_arc, 216, 216);
+        lv_obj_set_size(color_arc, 296, 296);
         lv_obj_center(color_arc);
         
-        // Set arc angles for each segment (60 degrees each)
-        int start_angle = i * segment_angle - 90; // Start at top (-90 degrees)
-        int end_angle = start_angle + segment_angle;
+        // Calculate angles with double-sized gaps: 50° segments with 10° gaps
+        int start_angle = (i * 60) + 5; // Start 5° into each 60° section
+        int end_angle = start_angle + 50;   // 50° segment length
         
-        lv_arc_set_bg_angles(color_arc, 0, 360); // Background full circle
-        lv_arc_set_angles(color_arc, start_angle, end_angle);
+        // Configure the arc to only show the colored segment
         lv_arc_set_range(color_arc, 0, 100);
-        lv_arc_set_value(color_arc, 100); // Full segment
+        lv_arc_set_value(color_arc, 100);
+        lv_arc_set_bg_angles(color_arc, start_angle, end_angle);
+        lv_arc_set_angles(color_arc, start_angle, end_angle);
         
-        // Set segment colors
+        // Style the arc
+        lv_obj_set_style_arc_color(color_arc, lv_color_hex(0x000000), LV_PART_MAIN);
+        lv_obj_set_style_arc_opa(color_arc, LV_OPA_TRANSP, LV_PART_MAIN);
         lv_obj_set_style_arc_color(color_arc, color_values[i], LV_PART_INDICATOR);
-        lv_obj_set_style_arc_color(color_arc, lv_color_hex(0x333333), LV_PART_MAIN);
-        lv_obj_set_style_arc_width(color_arc, 16, LV_PART_INDICATOR);
-        lv_obj_set_style_arc_width(color_arc, 16, LV_PART_MAIN);
+        lv_obj_set_style_arc_width(color_arc, 8, LV_PART_INDICATOR);
+        lv_obj_set_style_arc_width(color_arc, 8, LV_PART_MAIN);
         
         // Remove the knob
         lv_obj_remove_style(color_arc, NULL, LV_PART_KNOB);
         lv_obj_clear_flag(color_arc, LV_OBJ_FLAG_CLICKABLE);
         
-        // Store reference for highlighting
+        // Store reference
         color_bubbles[i] = color_arc;
     }
-    
-    // Remove instruction text as requested
     
     update_color_selection();
     
@@ -881,6 +909,7 @@ static void hide_color_menu(void)
         lv_obj_del(color_menu);
         color_menu = NULL;
         color_center_button = NULL;
+        color_title_label = NULL;
         
         // Clear color segment references
         for (int i = 0; i < 6; i++) {
@@ -896,16 +925,16 @@ static void update_color_selection(void)
     for (int i = 0; i < 6; i++) {
         if (color_bubbles[i] != NULL) {
             if (i == selected_color_index) {
-                // Highlight selected color segment with thicker arc and brighter color
-                lv_obj_set_style_arc_width(color_bubbles[i], 24, LV_PART_INDICATOR); // Thicker
-                lv_obj_set_style_arc_color(color_bubbles[i], color_values[i], LV_PART_INDICATOR);
+                // Highlight selected color arc with thicker width
+                lv_obj_set_style_arc_width(color_bubbles[i], 16, LV_PART_INDICATOR); // Thicker
+                lv_obj_set_style_arc_width(color_bubbles[i], 16, LV_PART_MAIN);
                 lv_obj_set_style_shadow_color(color_bubbles[i], lv_color_white(), LV_PART_MAIN);
                 lv_obj_set_style_shadow_width(color_bubbles[i], 8, LV_PART_MAIN);
                 lv_obj_set_style_shadow_opa(color_bubbles[i], LV_OPA_50, LV_PART_MAIN);
             } else {
                 // Normal appearance
-                lv_obj_set_style_arc_width(color_bubbles[i], 16, LV_PART_INDICATOR); // Normal thickness
-                lv_obj_set_style_arc_color(color_bubbles[i], color_values[i], LV_PART_INDICATOR);
+                lv_obj_set_style_arc_width(color_bubbles[i], 8, LV_PART_INDICATOR); // Normal thickness
+                lv_obj_set_style_arc_width(color_bubbles[i], 8, LV_PART_MAIN);
                 lv_obj_set_style_shadow_width(color_bubbles[i], 0, LV_PART_MAIN);
                 lv_obj_set_style_shadow_opa(color_bubbles[i], LV_OPA_TRANSP, LV_PART_MAIN);
             }
@@ -917,13 +946,13 @@ static lv_color_t get_contrasting_text_color(int color_index)
 {
     // Determine if the background is light or dark and return contrasting text color
     switch (color_index) {
-        case 0: // WHITE - use black text
-        case 5: // YELLOW - use black text
+        case 4: // LIGHT OLIVE - use black text (very light color)
             return lv_color_black();
-        case 1: // BLACK - use white text
-        case 2: // GREEN - use white text  
-        case 3: // RED - use white text
-        case 4: // BLUE - use white text
+        case 0: // DARK RED - use white text
+        case 1: // DARK GREEN - use white text
+        case 2: // ORANGE - use white text
+        case 3: // BLUE - use white text
+        case 5: // DARK PURPLE - use white text
         default:
             return lv_color_white();
     }
@@ -944,19 +973,8 @@ static void update_text_colors(int color_index)
         lv_obj_set_style_text_color(alarm_message_label, lv_color_hex(0xFF0000), LV_PART_MAIN); // Keep alarm red
     }
     
-    // Update match counter text colors
-    if (match_me_count != NULL) {
-        lv_obj_set_style_text_color(match_me_count, text_color, LV_PART_MAIN);
-    }
-    if (match_draw_count != NULL) {
-        lv_obj_set_style_text_color(match_draw_count, text_color, LV_PART_MAIN);
-    }
-    if (match_opp_count != NULL) {
-        lv_obj_set_style_text_color(match_opp_count, text_color, LV_PART_MAIN);
-    }
-    
-    // Keep match header labels with their original colors for distinction
-    // match_me_label, match_draw_label, match_opp_label keep their green/orange/red colors
+    // Match counter circles don't need text color updates since they use background colors
+    // The circles will maintain their result colors based on game outcomes
 }
 
 static void apply_background_color(int color_index)
@@ -993,6 +1011,17 @@ static void color_menu_close_cb(lv_event_t * e)
     
     if (code == LV_EVENT_CLICKED || code == LV_EVENT_LONG_PRESSED) {
         ESP_LOGI(TAG, "Color menu close requested");
+        haptic_feedback_short();
+        hide_color_menu();
+    }
+}
+
+static void color_circle_click_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    
+    if (code == LV_EVENT_CLICKED) {
+        ESP_LOGI(TAG, "Color circle clicked - closing menu");
         haptic_feedback_short();
         hide_color_menu();
     }
@@ -1081,21 +1110,23 @@ static void show_timer_setting_popup(void)
     lv_obj_clear_flag(timer_popup, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_event_cb(timer_popup, popup_close_cb, LV_EVENT_ALL, NULL);
     
-    // Create circular background - same size as brightness menu
-    lv_obj_t *timer_circle = lv_obj_create(timer_popup);
-    lv_obj_set_size(timer_circle, 240, 240);
+    // Create circular background - same size as Match menu (320x320)
+    timer_circle = lv_obj_create(timer_popup);
+    lv_obj_set_size(timer_circle, 320, 320);
     lv_obj_center(timer_circle);
-    lv_obj_set_style_radius(timer_circle, 120, LV_PART_MAIN);
+    lv_obj_set_style_radius(timer_circle, 160, LV_PART_MAIN);
     lv_obj_set_style_bg_color(timer_circle, lv_color_hex(0x333333), LV_PART_MAIN);
     lv_obj_set_style_border_color(timer_circle, lv_color_hex(0x00FF00), LV_PART_MAIN);
     lv_obj_set_style_border_width(timer_circle, 2, LV_PART_MAIN);
     lv_obj_clear_flag(timer_circle, LV_OBJ_FLAG_SCROLLABLE);
+    // Make the circle clickable for tap-to-close
+    lv_obj_add_event_cb(timer_circle, popup_close_cb, LV_EVENT_CLICKED, NULL);
     
-    // Create arc for timer visualization - same size as brightness menu
-    lv_obj_t *timer_arc = lv_arc_create(timer_popup);
-    lv_obj_set_size(timer_arc, 216, 216);
+    // Create arc for timer visualization - same size as Match menu (296x296)
+    timer_arc = lv_arc_create(timer_popup);
+    lv_obj_set_size(timer_arc, 296, 296);
     lv_obj_center(timer_arc);
-    lv_arc_set_range(timer_arc, 1, 60); // 1 to 60 minutes
+    lv_arc_set_range(timer_arc, 1, 60); // 1 to 60 minutes max
     lv_arc_set_value(timer_arc, timer_setting_minutes);
     lv_arc_set_bg_angles(timer_arc, 0, 360);
     lv_obj_set_style_arc_color(timer_arc, lv_color_hex(0x00FF00), LV_PART_INDICATOR); // Green
@@ -1126,6 +1157,8 @@ static void hide_timer_setting_popup(void)
         lv_obj_del(timer_popup);
         timer_popup = NULL;
         timer_set_label = NULL;
+        timer_arc = NULL;
+        timer_circle = NULL;
     }
 }
 
@@ -1133,8 +1166,13 @@ static void update_timer_setting_display(void)
 {
     if (timer_set_label != NULL) {
         char buf[16];
-        snprintf(buf, sizeof(buf), "%02lu:00", timer_setting_minutes);
+        snprintf(buf, sizeof(buf), "%02u:00", timer_setting_minutes);
         lv_label_set_text(timer_set_label, buf);
+    }
+    
+    // Update the arc dynamically
+    if (timer_arc != NULL) {
+        lv_arc_set_value(timer_arc, timer_setting_minutes);
     }
 }
 
@@ -1251,20 +1289,31 @@ static void stop_timer_alarm(void)
 // Match counter functions
 static void update_match_display(void)
 {
-    if (match_me_count != NULL) {
-        char buf[8];
-        snprintf(buf, sizeof(buf), "%d", match_me_wins);
-        lv_label_set_text(match_me_count, buf);
-    }
-    if (match_draw_count != NULL) {
-        char buf[8];
-        snprintf(buf, sizeof(buf), "%d", match_draws);
-        lv_label_set_text(match_draw_count, buf);
-    }
-    if (match_opp_count != NULL) {
-        char buf[8];
-        snprintf(buf, sizeof(buf), "%d", match_opp_wins);
-        lv_label_set_text(match_opp_count, buf);
+    // Update game result circles based on match_round_results
+    lv_obj_t* circles[3] = {match_circle_1, match_circle_2, match_circle_3};
+    
+    for (int i = 0; i < 3; i++) {
+        if (circles[i] != NULL) {
+            lv_color_t color;
+            switch (match_round_results[i]) {
+                case 0: // None/default
+                    color = lv_color_hex(0x666666); // Gray
+                    break;
+                case 1: // Me wins
+                    color = lv_color_hex(0x00AA00); // Green
+                    break;
+                case 2: // Draw
+                    color = lv_color_hex(0xFFAA00); // Yellow/Orange
+                    break;
+                case 3: // Opponent wins
+                    color = lv_color_hex(0xFF0000); // Red
+                    break;
+                default:
+                    color = lv_color_hex(0x666666); // Default gray
+                    break;
+            }
+            lv_obj_set_style_bg_color(circles[i], color, LV_PART_MAIN);
+        }
     }
 }
 
@@ -1718,55 +1767,33 @@ static void create_counter_ui(void)
     // === MATCH COUNTER SECTION (Bottom 1/3) ===
     // Match counter labels positioned directly on screen for stability
     
-    // Create header labels - use absolute positioning relative to screen
-    match_me_label = lv_label_create(scr);  // Create on screen, not container
-    lv_label_set_text(match_me_label, "Me");
-    lv_obj_set_style_text_color(match_me_label, lv_color_hex(0x00AA00), LV_PART_MAIN); // Green
-    lv_obj_set_style_text_font(match_me_label, &lv_font_montserrat_16, LV_PART_MAIN);
-    lv_obj_set_style_text_align(match_me_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(match_me_label, 90, 250);  // Closer spacing - was 60
-    lv_obj_clear_flag(match_me_label, LV_OBJ_FLAG_SCROLLABLE);
+    // Create three game result circles (from left to right: Game 1, Game 2, Game 3)
+    match_circle_1 = lv_obj_create(scr);  // Game 1 circle
+    lv_obj_set_size(match_circle_1, 30, 30);
+    lv_obj_set_style_radius(match_circle_1, 15, LV_PART_MAIN); // Make circular
+    lv_obj_set_style_bg_color(match_circle_1, lv_color_hex(0x666666), LV_PART_MAIN); // Default gray
+    lv_obj_set_style_border_width(match_circle_1, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(match_circle_1, lv_color_hex(0x999999), LV_PART_MAIN);
+    lv_obj_set_pos(match_circle_1, 120, 290);  // Left position
+    lv_obj_clear_flag(match_circle_1, LV_OBJ_FLAG_SCROLLABLE);
     
-    match_draw_label = lv_label_create(scr);  // Create on screen, not container
-    lv_label_set_text(match_draw_label, "Draw");
-    lv_obj_set_style_text_color(match_draw_label, lv_color_hex(0xFFAA00), LV_PART_MAIN); // Orange
-    lv_obj_set_style_text_font(match_draw_label, &lv_font_montserrat_16, LV_PART_MAIN);
-    lv_obj_set_style_text_align(match_draw_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(match_draw_label, 180, 250);  // Center position - was 170
-    lv_obj_clear_flag(match_draw_label, LV_OBJ_FLAG_SCROLLABLE);
+    match_circle_2 = lv_obj_create(scr);  // Game 2 circle
+    lv_obj_set_size(match_circle_2, 30, 30);
+    lv_obj_set_style_radius(match_circle_2, 15, LV_PART_MAIN); // Make circular
+    lv_obj_set_style_bg_color(match_circle_2, lv_color_hex(0x666666), LV_PART_MAIN); // Default gray
+    lv_obj_set_style_border_width(match_circle_2, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(match_circle_2, lv_color_hex(0x999999), LV_PART_MAIN);
+    lv_obj_set_pos(match_circle_2, 165, 290);  // Center position
+    lv_obj_clear_flag(match_circle_2, LV_OBJ_FLAG_SCROLLABLE);
     
-    match_opp_label = lv_label_create(scr);  // Create on screen, not container
-    lv_label_set_text(match_opp_label, "Opp");
-    lv_obj_set_style_text_color(match_opp_label, lv_color_hex(0xAA0000), LV_PART_MAIN); // Red
-    lv_obj_set_style_text_font(match_opp_label, &lv_font_montserrat_16, LV_PART_MAIN);
-    lv_obj_set_style_text_align(match_opp_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(match_opp_label, 270, 250);  // Closer spacing - was 280
-    lv_obj_clear_flag(match_opp_label, LV_OBJ_FLAG_SCROLLABLE);
-    
-    // Create count labels - use absolute positioning relative to screen
-    match_me_count = lv_label_create(scr);  // Create on screen, not container
-    lv_label_set_text(match_me_count, "0");
-    lv_obj_set_style_text_color(match_me_count, lv_color_white(), LV_PART_MAIN);
-    lv_obj_set_style_text_font(match_me_count, &lv_font_montserrat_32, LV_PART_MAIN);
-    lv_obj_set_style_text_align(match_me_count, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(match_me_count, 90, 285);  // Closer spacing - was 60
-    lv_obj_clear_flag(match_me_count, LV_OBJ_FLAG_SCROLLABLE);
-    
-    match_draw_count = lv_label_create(scr);  // Create on screen, not container
-    lv_label_set_text(match_draw_count, "0");
-    lv_obj_set_style_text_color(match_draw_count, lv_color_white(), LV_PART_MAIN);
-    lv_obj_set_style_text_font(match_draw_count, &lv_font_montserrat_32, LV_PART_MAIN);
-    lv_obj_set_style_text_align(match_draw_count, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(match_draw_count, 180, 285);  // Center position - was 170
-    lv_obj_clear_flag(match_draw_count, LV_OBJ_FLAG_SCROLLABLE);
-    
-    match_opp_count = lv_label_create(scr);  // Create on screen, not container
-    lv_label_set_text(match_opp_count, "0");
-    lv_obj_set_style_text_color(match_opp_count, lv_color_white(), LV_PART_MAIN);
-    lv_obj_set_style_text_font(match_opp_count, &lv_font_montserrat_32, LV_PART_MAIN);
-    lv_obj_set_style_text_align(match_opp_count, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_pos(match_opp_count, 270, 285);  // Closer spacing - was 280
-    lv_obj_clear_flag(match_opp_count, LV_OBJ_FLAG_SCROLLABLE);
+    match_circle_3 = lv_obj_create(scr);  // Game 3 circle
+    lv_obj_set_size(match_circle_3, 30, 30);
+    lv_obj_set_style_radius(match_circle_3, 15, LV_PART_MAIN); // Make circular
+    lv_obj_set_style_bg_color(match_circle_3, lv_color_hex(0x666666), LV_PART_MAIN); // Default gray
+    lv_obj_set_style_border_width(match_circle_3, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(match_circle_3, lv_color_hex(0x999999), LV_PART_MAIN);
+    lv_obj_set_pos(match_circle_3, 210, 290);  // Right position
+    lv_obj_clear_flag(match_circle_3, LV_OBJ_FLAG_SCROLLABLE);
     
     // Create invisible touch area for match counter - use absolute positioning
     match_touch_area = lv_obj_create(scr);  // Create on screen, not container
@@ -1890,7 +1917,7 @@ static void encoder_task(void *arg)
                 // Decrease timer minutes (minimum 1 minute)
                 if (timer_setting_minutes > 1) {
                     timer_setting_minutes--;
-                    ESP_LOGI(TAG, "Timer setting decremented to: %lu minutes", timer_setting_minutes);
+                    ESP_LOGI(TAG, "Timer setting decremented to: %u minutes", timer_setting_minutes);
                     
                     // Haptic feedback for timer decrement
                     haptic_feedback_short();
@@ -1956,10 +1983,10 @@ static void encoder_task(void *arg)
                     example_lvgl_unlock();
                 }
             } else if (timer_setting_mode) {
-                // Increase timer minutes (maximum 99 minutes)
-                if (timer_setting_minutes < 99) {
+                // Increase timer minutes (maximum 60 minutes)
+                if (timer_setting_minutes < 60) {
                     timer_setting_minutes++;
-                    ESP_LOGI(TAG, "Timer setting incremented to: %lu minutes", timer_setting_minutes);
+                    ESP_LOGI(TAG, "Timer setting incremented to: %u minutes", timer_setting_minutes);
                     
                     // Haptic feedback for timer increment
                     haptic_feedback_short();

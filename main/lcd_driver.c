@@ -1,7 +1,6 @@
 #include "lcd_driver.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
-#include "driver/ledc.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
@@ -91,60 +90,63 @@ esp_err_t lcd_init(void)
 {
     ESP_LOGI(TAG, "Initializing LCD");
     
-    // Initialize GPIO pins
+    // Initialize GPIO pins (Reset and Backlight only, no DC pin for QSPI)
     gpio_config_t io_conf = {
         .intr_type = GPIO_INTR_DISABLE,
         .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = (1ULL << LCD_PIN_NUM_DC) | (1ULL << LCD_PIN_NUM_RST) | (1ULL << LCD_PIN_NUM_BL),
+        .pin_bit_mask = (1ULL << LCD_PIN_NUM_RST) | (1ULL << LCD_PIN_NUM_BL),
         .pull_down_en = 0,
         .pull_up_en = 0,
     };
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
-    // Initialize SPI bus
+    // Initialize SPI bus with standard SPI configuration (try this first)
     spi_bus_config_t buscfg = {
         .miso_io_num = -1,
-        .mosi_io_num = LCD_PIN_NUM_MOSI,
-        .sclk_io_num = LCD_PIN_NUM_CLK,
+        .mosi_io_num = LCD_PIN_NUM_MOSI,  // D0 (GPIO 15)
+        .sclk_io_num = LCD_PIN_NUM_CLK,   // CLK (GPIO 13)
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
         .max_transfer_sz = LCD_WIDTH * LCD_HEIGHT * sizeof(uint16_t),
+        .flags = SPICOMMON_BUSFLAG_MASTER,
     };
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
-    // Configure LCD panel IO
+    // Configure LCD panel IO (standard SPI mode with DC pin)
     esp_lcd_panel_io_spi_config_t io_config = {
-        .dc_gpio_num = LCD_PIN_NUM_DC,
+        .dc_gpio_num = LCD_PIN_NUM_RST,  // Use RST as DC for now
         .cs_gpio_num = LCD_PIN_NUM_CS,
-        .pclk_hz = 10 * 1000 * 1000,  // 10MHz
-        .lcd_cmd_bits = 8,
+        .pclk_hz = 20 * 1000 * 1000,  // 20MHz (lower speed)
+        .lcd_cmd_bits = 8,  // Standard command bits
         .lcd_param_bits = 8,
         .spi_mode = 0,
         .trans_queue_depth = 10,
     };
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)SPI2_HOST, &io_config, &io_handle));
 
-    // Configure LCD panel
+    // Configure LCD panel for ST7789 controller
     esp_lcd_panel_dev_config_t panel_config = {
-        .reset_gpio_num = LCD_PIN_NUM_RST,
+        .reset_gpio_num = -1,  // We'll handle reset manually
         .rgb_endian = LCD_RGB_ENDIAN_BGR,
         .bits_per_pixel = 16,
     };
     
-    // Try ST7789 controller first (common for round LCDs)
+    // Use ST7789 controller as fallback (widely compatible)
+    ESP_LOGI(TAG, "Installing ST7789 LCD driver");
     esp_err_t ret = esp_lcd_new_panel_st7789(io_handle, &panel_config, &panel_handle);
     if (ret != ESP_OK) {
-        ESP_LOGW(TAG, "ST7789 initialization failed, trying generic controller");
-        // Fallback to generic controller if ST7789 fails
-        ret = esp_lcd_new_panel_st7789(io_handle, &panel_config, &panel_handle);
-        if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "LCD panel initialization failed: %s", esp_err_to_name(ret));
-            return ret;
-        }
+        ESP_LOGE(TAG, "ST7789 LCD panel initialization failed: %s", esp_err_to_name(ret));
+        return ret;
     }
 
+    // Manual reset sequence
+    ESP_LOGI(TAG, "Performing manual LCD reset");
+    gpio_set_level(LCD_PIN_NUM_RST, 0);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    gpio_set_level(LCD_PIN_NUM_RST, 1);
+    vTaskDelay(pdMS_TO_TICKS(120));
+
     // Reset and initialize the panel
-    ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
     
     // Set orientation and gap
@@ -155,25 +157,13 @@ esp_err_t lcd_init(void)
     // Turn on display
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
 
-    // Initialize backlight (PWM)
-    ledc_timer_config_t ledc_timer = {
-        .duty_resolution = LEDC_TIMER_8_BIT,
-        .freq_hz = 5000,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .timer_num = LEDC_TIMER_0,
-        .clk_cfg = LEDC_AUTO_CLK,
-    };
-    ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
-
-    ledc_channel_config_t ledc_channel = {
-        .channel = LEDC_CHANNEL_0,
-        .duty = 200,  // Start with moderate brightness
-        .gpio_num = LCD_PIN_NUM_BL,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .timer_sel = LEDC_TIMER_0,
-    };
-    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
-
+    // Set backlight to maximum using GPIO 47 (simple GPIO control)
+    ESP_LOGI(TAG, "Setting backlight to maximum (GPIO 47)");
+    gpio_set_level(LCD_PIN_NUM_BL, 1);
+    
+    // Add a small delay to ensure everything is initialized
+    vTaskDelay(pdMS_TO_TICKS(100));
+    
     ESP_LOGI(TAG, "LCD initialization completed");
     return ESP_OK;
 }

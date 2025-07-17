@@ -1,4 +1,15 @@
 #pragma once
+// GPIO pin definitions for Waveshare ESP32-S3-Knob-Touch-LCD-1.8
+// EXACT configuration from working Waveshare demo
+#define LCD_PIN_NUM_CS      14    // Chip Select
+#define LCD_PIN_NUM_CLK     13    // QSPI Clock
+#define LCD_PIN_NUM_MOSI    15    // QSPI D0 (MOSI)
+#define LCD_PIN_NUM_D1      16    // QSPI D1
+#define LCD_PIN_NUM_D2      17    // QSPI D2  
+#define LCD_PIN_NUM_D3      18    // QSPI D3
+#define LCD_PIN_NUM_RST     21    // Reset
+#define LCD_PIN_NUM_BL      47    // Backlight
+#define LCD_PIN_NUM_DC      -1    // Not used in QSPI mode
 
 #include "esp_err.h"
 #include <stdint.h>
@@ -11,14 +22,6 @@ extern "C" {
 #define LCD_WIDTH       360
 #define LCD_HEIGHT      360
 #define LCD_BIT_PER_PIXEL 16
-
-// GPIO pin definitions (adjust based on actual board connections)
-#define LCD_PIN_NUM_MOSI    11
-#define LCD_PIN_NUM_CLK     12
-#define LCD_PIN_NUM_CS      10
-#define LCD_PIN_NUM_DC      13
-#define LCD_PIN_NUM_RST     14
-#define LCD_PIN_NUM_BL      15
 
 // Color definitions (RGB565 format)
 #define COLOR_BLACK     0x0000

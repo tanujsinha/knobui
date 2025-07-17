@@ -1,0 +1,52 @@
+# ESP32-S3 Device Upload Steps
+
+## 1. VERIFY ESP-IDF INSTALLATION
+Run: .\verify-esp-idf.bat
+Expected: "ESP-IDF Installation Status: READY ✅"
+
+## 2. CONNECT HARDWARE
+- Connect ESP32-S3 board to computer via USB-C cable
+- Try different USB-C orientations if not detected
+- Check Device Manager for new COM port (Windows)
+
+## 3. BUILD PROJECT
+Run: .\build.bat
+Or manually:
+  idf.py set-target esp32s3
+  idf.py build
+
+## 4. FLASH TO DEVICE
+Option A - Quick flash and monitor:
+  idf.py flash monitor
+
+Option B - Using VS Code:
+  Ctrl+Shift+P → "ESP-IDF: Flash your project"
+  Ctrl+Shift+P → "ESP-IDF: Monitor your device"
+
+## 5. EXPECTED RESULTS
+LCD Display (360x360):
+- "HELLO WORLD!" (white text, top)
+- "ESP LCD TEST" (cyan text, middle)
+- "STATUS OK" (green text, blinking every 2 seconds)
+- Three colored rectangles (red, green, blue)
+- White border around screen
+
+Serial Monitor (115200 baud):
+- Initialization messages
+- "LCD initialized successfully"
+- "Test display complete!"
+- Periodic "Heartbeat" messages
+- Memory usage reports
+
+## TROUBLESHOOTING
+Flash Issues:
+- Hold BOOT button while connecting USB
+- Try different USB-C cable
+- Check COM port in Device Manager
+- Ensure adequate power supply
+
+No Display:
+- Verify GPIO pin connections match board
+- Check LCD power connections
+- Review serial monitor for errors
+- Confirm ST7789 controller compatibility

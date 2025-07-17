@@ -36,60 +36,22 @@ You should see something like:
 ESP-IDF v5.1.x
 ```
 
-## Current Project Status
-
-✅ **FLASHING SUCCESSFUL** - Timer alarm firmware has been successfully flashed to the ESP32 device.
-
-⚠️ **Hardware Mismatch Detected**: 
-- Your device is an **ESP32-U4WDH** (not ESP32-S3)
-- Current configuration is set for ESP32-S3, causing PSRAM initialization errors
-- Device reboots due to missing PSRAM hardware
-
-### Immediate Next Steps
-
-1. **Fix Target Configuration**:
-   ```powershell
-   # Remove current build
-   Remove-Item -Path "build" -Recurse -Force -ErrorAction SilentlyContinue
-   
-   # Set correct target
-   C:\Users\Zach\esp\v5.2.5\esp-idf\export.ps1
-   idf.py set-target esp32
-   ```
-
-2. **Rebuild and Flash**:
-   ```powershell
-   idf.py build
-   idf.py flash monitor
-   ```
-
-### Timer Alarm Features (Ready to Test)
-
-Your timer alarm functionality is fully implemented and ready:
-
-- **Visual Alarm**: Timer text turns red when timer ends
-- **"Round Ended" Message**: Appears below the timer display  
-- **2-Second Haptic Alarm**: Vibration pattern (200ms on, 100ms off, 200ms on, 300ms pause)
-- **Automatic Reset**: Alarm clears when timer is restarted
-
 ## Project Setup
 
 Once ESP-IDF is installed:
 
 ### 1. Set Target Device
 ```powershell
-idf.py set-target esp32
+idf.py set-target esp32s3
 ```
-
-**Note**: This project detects ESP32-U4WDH hardware, so we use `esp32` target (not `esp32s3`).
 
 ### 2. Build the Project
 ```powershell
 idf.py build
 ```
 
-### Flash to Device
-Connect your ESP32 board via USB-C, then:
+### 3. Flash to Device
+Connect your ESP32-S3 board via USB-C, then:
 ```powershell
 idf.py flash
 ```
@@ -116,9 +78,7 @@ idf.py flash monitor
 
 ## Hardware Setup
 
-### ESP32-Knob-Touch-LCD-1.8 Connections
-
-**Hardware Detected**: ESP32-U4WDH (revision v3.0) with WiFi and BT capabilities
+### ESP32-S3-Knob-Touch-LCD-1.8 Connections
 
 **Important**: The GPIO pin assignments in the code may need adjustment based on your specific board's pinout. Verify these connections:
 
@@ -144,7 +104,7 @@ idf.py flash monitor
 - Try opening ESP-IDF Terminal from VS Code
 
 ### Build Errors
-- Verify target is set to `esp32` (not `esp32s3`)
+- Verify target is set to `esp32s3`
 - Check that all required components are available
 - Try `idf.py clean` then `idf.py build`
 
@@ -170,6 +130,27 @@ Once the basic test is working:
 4. **LVGL**: Integrate LVGL for advanced GUI
 5. **Wi-Fi**: Add wireless connectivity
 6. **SD Card**: Implement file system support
+
+## GitHub Integration
+
+### Quick Updates
+Use VS Code tasks for easy GitHub updates:
+- `Ctrl+Shift+P` → `Tasks: Run Task` → `Git: Quick Update`
+- `Ctrl+Shift+P` → `Tasks: Run Task` → `Git: Status`
+
+### Manual Updates
+```powershell
+# Quick update with PowerShell script
+.\quick-update.ps1 "Your commit message"
+
+# Or manual git commands
+git add .
+git commit -m "Your changes description"
+git push
+```
+
+### Repository URL
+https://github.com/zwood425/swubasedatapad
 
 ## Resources
 

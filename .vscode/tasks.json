@@ -69,6 +69,39 @@
             "args": ["menuconfig"],
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "Git: Quick Update",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$msg = Read-Host 'Enter commit message'; if($msg) { git add .; git commit -m \"$msg - $(Get-Date -Format 'yyyy-MM-dd HH:mm')\"; git push; Write-Host '✅ Updated GitHub!' -ForegroundColor Green } else { Write-Host '❌ No message provided' -ForegroundColor Red }"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Status",
+            "type": "shell",
+            "command": "git",
+            "args": ["status", "--short"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }

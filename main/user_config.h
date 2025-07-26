@@ -47,6 +47,8 @@
 //#define Backlight_Testing
 //#define EXAMPLE_Rotate_90
 
+#define LOCAL_UI 1
+
 
 //bit
 

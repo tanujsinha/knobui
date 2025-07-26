@@ -24,6 +24,10 @@
 #include "user_encoder_bsp.h"
 #include "i2c_equipment.h"
 
+#ifdef LOCAL_UI
+#include "ui/ui.h"
+#endif
+
 static const char *TAG = "counter";
 static SemaphoreHandle_t lvgl_mux = NULL;
 
@@ -2179,7 +2183,11 @@ void app_main(void)
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (example_lvgl_lock(-1))
     {
+#ifdef LOCAL_UI
+        ui_init();
+#else
         create_counter_ui();
+#endif
         // Release the mutex
         example_lvgl_unlock();
     }
@@ -2190,13 +2198,15 @@ void app_main(void)
     timer_start_time = 0;
     timer_elapsed_total = 0;
     timer_handle = NULL;
-    
+
+#ifndef LOCAL_UI
     // Update initial timer display
     if (example_lvgl_lock(-1))
     {
         update_timer_display();
         example_lvgl_unlock();
     }
+#endif
     
     // Initialize match counter variables
     match_me_wins = 0;
@@ -2208,12 +2218,14 @@ void app_main(void)
         match_round_results[i] = 0;
     }
     
+#ifndef LOCAL_UI
     // Update initial match display
     if (example_lvgl_lock(-1))
     {
         update_match_display();
         example_lvgl_unlock();
     }
+#endif
     
     ESP_LOGI(TAG, "Timer initialized");
     ESP_LOGI(TAG, "Match counter initialized");

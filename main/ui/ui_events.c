@@ -20,6 +20,8 @@ void OpenClock(lv_event_t * e)
 			lv_disp_load_scr( ui_watch_analog);
 			break;
 		case 1:
+			lv_disp_load_scr( ui_LedColor);
+			break;
 		case 2:
 		case 3:
 		default:
@@ -34,7 +36,7 @@ void roller_event_cb(lv_event_t *e)
     lv_event_code_t code = lv_event_get_code(e);
     if (code == LV_EVENT_VALUE_CHANGED) {
         // Trigger haptic feedback
-        i2c_drv2605_haptic_feedback(10);
+        //i2c_drv2605_haptic_feedback(10);
 
         // Optional: handle other logic, e.g., get selected option
         lv_obj_t *roller = lv_event_get_target(e);
@@ -44,5 +46,6 @@ void roller_event_cb(lv_event_t *e)
 }
 void ReturnToMenu(lv_event_t * e)
 {
+	lv_disp_load_scr( ui_Menu);
 	// Your code here
 }

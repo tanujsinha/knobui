@@ -397,7 +397,7 @@ ui____initial_actions0 = lv_obj_create(NULL);
 lv_obj_add_event_cb(ui____initial_actions0, ui_event____initial_actions0, LV_EVENT_ALL, NULL);
 
 lv_disp_load_scr(ui____initial_actions0);
-lv_disp_load_scr( ui_watch_analog);
+lv_disp_load_scr( ui_Menu);
 }
 
 void ui_destroy( void )

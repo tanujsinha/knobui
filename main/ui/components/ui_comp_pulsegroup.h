@@ -18,7 +18,7 @@ extern "C" {
 #define UI_COMP_PULSEGROUP_PULSE_NUMBER 2
 #define UI_COMP_PULSEGROUP_BPM 3
 #define _UI_COMP_PULSEGROUP_NUM 4
-lv_obj_t *ui_pulsegroup_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_pulsegroup_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

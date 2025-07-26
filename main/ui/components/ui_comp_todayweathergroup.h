@@ -18,7 +18,7 @@ extern "C" {
 #define UI_COMP_TODAYWEATHERGROUP_CLOUD_SUN 2
 #define UI_COMP_TODAYWEATHERGROUP_DEGREE_8 3
 #define _UI_COMP_TODAYWEATHERGROUP_NUM 4
-lv_obj_t *ui_todayweathergroup_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_todayweathergroup_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -13,10 +13,9 @@ extern "C" {
 // SCREEN: ui_Menu
 extern void ui_Menu_screen_init(void);
 extern void ui_Menu_screen_destroy(void);
-extern lv_obj_t *ui_Menu;
-extern lv_obj_t *ui_Image1;
-extern void ui_event_MenuRoller( lv_event_t * e);
-extern lv_obj_t *ui_MenuRoller;
+extern lv_obj_t * ui_Menu;
+extern void ui_event_MenuRoller(lv_event_t * e);
+extern lv_obj_t * ui_MenuRoller;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

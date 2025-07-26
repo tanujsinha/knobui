@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-void ReturnToMenu(lv_event_t * e);
 void OpenClock(lv_event_t * e);
+void ReturnToMenu(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

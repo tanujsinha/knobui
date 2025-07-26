@@ -18,7 +18,7 @@ extern "C" {
 #define UI_COMP_DATEGROUP_MONTH 2
 #define UI_COMP_DATEGROUP_YEAR 3
 #define _UI_COMP_DATEGROUP_NUM 4
-lv_obj_t *ui_dategroup_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_dategroup_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

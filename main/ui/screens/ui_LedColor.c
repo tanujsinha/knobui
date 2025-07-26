@@ -5,55 +5,57 @@
 
 #include "../ui.h"
 
-lv_obj_t *ui_LedColor = NULL;lv_obj_t *ui_LedColorWheel = NULL;lv_obj_t *ui_BackButtonLed = NULL;
+lv_obj_t * ui_LedColor = NULL;
+lv_obj_t * ui_LedColorWheel = NULL;
+lv_obj_t * ui_BackButtonLed = NULL;
 // event funtions
-void ui_event_BackButtonLed( lv_event_t * e) {
+void ui_event_BackButtonLed(lv_event_t * e)
+{
     lv_event_code_t event_code = lv_event_get_code(e);
 
-if ( event_code == LV_EVENT_CLICKED) {
-      ReturnToMenu( e );
-}
+    if(event_code == LV_EVENT_CLICKED) {
+        ReturnToMenu(e);
+    }
 }
 
 // build funtions
 
 void ui_LedColor_screen_init(void)
 {
-ui_LedColor = lv_obj_create(NULL);
-lv_obj_clear_flag( ui_LedColor, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-lv_obj_set_style_bg_color(ui_LedColor, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT );
-lv_obj_set_style_bg_opa(ui_LedColor, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+    ui_LedColor = lv_obj_create(NULL);
+    lv_obj_clear_flag(ui_LedColor, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_LedColor, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_LedColor, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-ui_LedColorWheel = lv_colorwheel_create(ui_LedColor,true);
-lv_obj_set_width( ui_LedColorWheel, 350);
-lv_obj_set_height( ui_LedColorWheel, 350);
-lv_obj_set_align( ui_LedColorWheel, LV_ALIGN_CENTER );
+    ui_LedColorWheel = lv_colorwheel_create(ui_LedColor, true);
+    lv_obj_set_width(ui_LedColorWheel, 350);
+    lv_obj_set_height(ui_LedColorWheel, 350);
+    lv_obj_set_align(ui_LedColorWheel, LV_ALIGN_CENTER);
+    lv_obj_set_style_arc_width(ui_LedColorWheel, 30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-ui_BackButtonLed = lv_btn_create(ui_LedColor);
-lv_obj_set_width( ui_BackButtonLed, 30);
-lv_obj_set_height( ui_BackButtonLed, 30);
-lv_obj_set_x( ui_BackButtonLed, -150 );
-lv_obj_set_y( ui_BackButtonLed, -150 );
-lv_obj_set_align( ui_BackButtonLed, LV_ALIGN_CENTER );
-lv_obj_add_flag( ui_BackButtonLed, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
-lv_obj_clear_flag( ui_BackButtonLed, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-lv_obj_set_style_bg_color(ui_BackButtonLed, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT );
-lv_obj_set_style_bg_opa(ui_BackButtonLed, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_bg_img_src( ui_BackButtonLed, &ui_img_arrow_png, LV_PART_MAIN | LV_STATE_DEFAULT );
-lv_obj_set_style_bg_img_recolor(ui_BackButtonLed, lv_color_hex(0x565656), LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_bg_img_recolor_opa(ui_BackButtonLed, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+    ui_BackButtonLed = lv_btn_create(ui_LedColor);
+    lv_obj_set_width(ui_BackButtonLed, 30);
+    lv_obj_set_height(ui_BackButtonLed, 30);
+    lv_obj_set_align(ui_BackButtonLed, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_BackButtonLed, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_BackButtonLed, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_BackButtonLed, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_BackButtonLed, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_BackButtonLed, &ui_img_arrow_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_recolor(ui_BackButtonLed, lv_color_hex(0x565656), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_recolor_opa(ui_BackButtonLed, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-lv_obj_add_event_cb(ui_BackButtonLed, ui_event_BackButtonLed, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_BackButtonLed, ui_event_BackButtonLed, LV_EVENT_ALL, NULL);
 
 }
 
 void ui_LedColor_screen_destroy(void)
 {
-   if (ui_LedColor) lv_obj_del(ui_LedColor);
+    if(ui_LedColor) lv_obj_del(ui_LedColor);
 
-// NULL screen variables
-ui_LedColor= NULL;
-ui_LedColorWheel= NULL;
-ui_BackButtonLed= NULL;
+    // NULL screen variables
+    ui_LedColor = NULL;
+    ui_LedColorWheel = NULL;
+    ui_BackButtonLed = NULL;
 
 }

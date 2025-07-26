@@ -17,51 +17,40 @@ extern "C" {
 #include "components/ui_comp_hook.h"
 #include "ui_events.h"
 
+
 ///////////////////// SCREENS ////////////////////
-#include "screens/ui_watch_analog.h"
+
 #include "screens/ui_Menu.h"
 #include "screens/ui_LedColor.h"
 
 ///////////////////// VARIABLES ////////////////////
-extern lv_anim_t * sec_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * min_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * hour_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * left_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * right_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * opa_on_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * dots_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * top_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * cloud_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * blood2_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * blood1_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * heart_Animation( lv_obj_t *TargetObject, int delay);
+
+extern lv_anim_t * sec_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * min_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * hour_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * left_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * right_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * opa_on_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * dots_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * top_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * cloud_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * blood2_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * blood1_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * heart_Animation(lv_obj_t * TargetObject, int delay);
 
 // EVENTS
-void ui_event____initial_actions0( lv_event_t * e);
-extern lv_obj_t *ui____initial_actions0;
+
+extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE( ui_img_bg1_png);   // assets/bg1.png
-LV_IMG_DECLARE( ui_img_flash_png);   // assets/flash.png
-LV_IMG_DECLARE( ui_img_weather_sun_cloud_png);   // assets/weather_sun_cloud.png
-LV_IMG_DECLARE( ui_img_step_png);   // assets/step.png
-LV_IMG_DECLARE( ui_img_daily_mission_png);   // assets/daily_mission.png
-LV_IMG_DECLARE( ui_img_call1_png);   // assets/call1.png
-LV_IMG_DECLARE( ui_img_btn_bg_1_png);   // assets/btn_bg_1.png
-LV_IMG_DECLARE( ui_img_weather_png);   // assets/weather.png
-LV_IMG_DECLARE( ui_img_btn_bg_3_png);   // assets/btn_bg_3.png
-LV_IMG_DECLARE( ui_img_clockwise_sec_png);   // assets/clockwise_sec.png
-LV_IMG_DECLARE( ui_img_clockwise_min_png);   // assets/clockwise_min.png
-LV_IMG_DECLARE( ui_img_clockwise_hour_png);   // assets/clockwise_hour.png
-LV_IMG_DECLARE( ui_img_arrow_png);   // assets/arrow.png
-LV_IMG_DECLARE( ui_img_bg3_png);   // assets/bg3.png
+LV_IMG_DECLARE(ui_img_arrow_png);    // assets/arrow.png
 
 // FONTS
-LV_FONT_DECLARE( ui_font_H1);
-LV_FONT_DECLARE( ui_font_Number_big);
-LV_FONT_DECLARE( ui_font_Number_extra);
-LV_FONT_DECLARE( ui_font_Subtitle);
-LV_FONT_DECLARE( ui_font_Title);
+LV_FONT_DECLARE(ui_font_H1);
+LV_FONT_DECLARE(ui_font_Number_big);
+LV_FONT_DECLARE(ui_font_Number_extra);
+LV_FONT_DECLARE(ui_font_Subtitle);
+LV_FONT_DECLARE(ui_font_Title);
 
 // UI INIT
 void ui_init(void);

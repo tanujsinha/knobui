@@ -15,7 +15,7 @@ extern "C" {
 // COMPONENT buttonround
 #define UI_COMP_BUTTONROUND_BUTTONROUND 0
 #define _UI_COMP_BUTTONROUND_NUM 1
-lv_obj_t *ui_buttonround_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_buttonround_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -17,7 +17,7 @@ extern "C" {
 #define UI_COMP_TITLEGROUP_TITLE 1
 #define UI_COMP_TITLEGROUP_SUBTITLE 2
 #define _UI_COMP_TITLEGROUP_NUM 3
-lv_obj_t *ui_titlegroup_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_titlegroup_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

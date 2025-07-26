@@ -20,7 +20,7 @@ extern "C" {
 #define UI_COMP_FORECASTGROUP_DEGREE_GROUP_NIGHTTIME 4
 #define UI_COMP_FORECASTGROUP_CLOUD_SUN 5
 #define _UI_COMP_FORECASTGROUP_NUM 6
-lv_obj_t *ui_forecastgroup_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_forecastgroup_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

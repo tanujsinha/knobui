@@ -17,7 +17,7 @@ extern "C" {
 #define UI_COMP_BATTERYGROUP_FLASH 1
 #define UI_COMP_BATTERYGROUP_BATTERY_PERCENT 2
 #define _UI_COMP_BATTERYGROUP_NUM 3
-lv_obj_t *ui_batterygroup_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_batterygroup_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

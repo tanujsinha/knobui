@@ -18,8 +18,8 @@ extern "C" {
 #define UI_COMP_DAILYMISSIONGROUP_DAILY_MISSION_IMAGE 2
 #define UI_COMP_DAILYMISSIONGROUP_DAILY_MISSION_ARC 3
 #define _UI_COMP_DAILYMISSIONGROUP_NUM 4
-lv_obj_t *ui_dailymissiongroup_create(lv_obj_t *comp_parent);
-void ui_event_comp_dailymissiongroup_daily_mission_arc( lv_event_t * e);
+lv_obj_t * ui_dailymissiongroup_create(lv_obj_t * comp_parent);
+void ui_event_comp_dailymissiongroup_daily_mission_arc(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

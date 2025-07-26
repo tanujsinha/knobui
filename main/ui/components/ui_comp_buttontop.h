@@ -17,7 +17,7 @@ extern "C" {
 #define UI_COMP_BUTTONTOP_BUTTON_TOP_ICON 1
 #define UI_COMP_BUTTONTOP_LINE 2
 #define _UI_COMP_BUTTONTOP_NUM 3
-lv_obj_t *ui_buttontop_create(lv_obj_t *comp_parent);
+lv_obj_t * ui_buttontop_create(lv_obj_t * comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

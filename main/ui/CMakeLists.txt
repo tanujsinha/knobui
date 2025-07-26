@@ -1,17 +1,4 @@
-SET(SOURCES components/ui_comp_batterygroup.c
-    components/ui_comp_buttondown.c
-    components/ui_comp_buttonround.c
-    components/ui_comp_buttontop.c
-    components/ui_comp_dailymissiongroup.c
-    components/ui_comp_dategroup.c
-    components/ui_comp_forecastgroup.c
-    components/ui_comp_pulsegroup.c
-    components/ui_comp_stepgroup.c
-    components/ui_comp_titlegroup.c
-    components/ui_comp_todayweathergroup.c
-    components/ui_comp_weathergroup1.c
-    components/ui_comp.c
-    screens/ui_Menu.c
+SET(SOURCES screens/ui_Menu.c
     screens/ui_LedColor.c
     ui.c
     components/ui_comp_hook.c

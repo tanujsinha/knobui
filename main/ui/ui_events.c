@@ -17,7 +17,6 @@ void OpenClock(lv_event_t * e)
 	switch(selected_index)
 	{
 		case 0:
-			//lv_disp_load_scr( ui_watch_analog);
 			break;
 		case 1:
 			lv_disp_load_scr( ui_LedColor);

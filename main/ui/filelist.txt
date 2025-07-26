@@ -13,6 +13,7 @@ components/ui_comp_weathergroup1.c
 components/ui_comp.c
 screens/ui_watch_analog.c
 screens/ui_Menu.c
+screens/ui_LedColor.c
 ui.c
 components/ui_comp_hook.c
 ui_helpers.c
@@ -29,6 +30,7 @@ images/ui_img_btn_bg_3_png.c
 images/ui_img_clockwise_sec_png.c
 images/ui_img_clockwise_min_png.c
 images/ui_img_clockwise_hour_png.c
+images/ui_img_arrow_png.c
 images/ui_img_bg3_png.c
 fonts/ui_font_H1.c
 fonts/ui_font_Number_big.c

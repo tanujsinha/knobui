@@ -20,6 +20,7 @@ extern "C" {
 ///////////////////// SCREENS ////////////////////
 #include "screens/ui_watch_analog.h"
 #include "screens/ui_Menu.h"
+#include "screens/ui_LedColor.h"
 
 ///////////////////// VARIABLES ////////////////////
 extern lv_anim_t * sec_Animation( lv_obj_t *TargetObject, int delay);
@@ -52,6 +53,7 @@ LV_IMG_DECLARE( ui_img_btn_bg_3_png);   // assets/btn_bg_3.png
 LV_IMG_DECLARE( ui_img_clockwise_sec_png);   // assets/clockwise_sec.png
 LV_IMG_DECLARE( ui_img_clockwise_min_png);   // assets/clockwise_min.png
 LV_IMG_DECLARE( ui_img_clockwise_hour_png);   // assets/clockwise_hour.png
+LV_IMG_DECLARE( ui_img_arrow_png);   // assets/arrow.png
 LV_IMG_DECLARE( ui_img_bg3_png);   // assets/bg3.png
 
 // FONTS

@@ -3,15 +3,19 @@
 // LVGL version: 8.3.11
 // Project name: Smartwatch
 
-#ifndef _UI_EVENTS_H
-#define _UI_EVENTS_H
+#ifndef _UI_COMP_BUTTONROUND_H
+#define _UI_COMP_BUTTONROUND_H
+
+#include "../ui.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void ReturnToMenu(lv_event_t * e);
-void OpenClock(lv_event_t * e);
+// COMPONENT buttonround
+#define UI_COMP_BUTTONROUND_BUTTONROUND 0
+#define _UI_COMP_BUTTONROUND_NUM 1
+lv_obj_t *ui_buttonround_create(lv_obj_t *comp_parent);
 
 #ifdef __cplusplus
 } /*extern "C"*/

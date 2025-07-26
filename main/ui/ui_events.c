@@ -42,3 +42,7 @@ void roller_event_cb(lv_event_t *e)
         lv_roller_get_selected_str(roller, buf, sizeof(buf));
     }
 }
+void ReturnToMenu(lv_event_t * e)
+{
+	// Your code here
+}

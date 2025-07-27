@@ -4,6 +4,7 @@
 // Project name: Smartwatch
 
 #include "../ui.h"
+#include <stdio.h>
 
 lv_obj_t * ui_LedColor = NULL;
 lv_obj_t * ui_LedColorWheel = NULL;
@@ -78,10 +79,16 @@ void ui_LedColor_screen_destroy(void)
 
 }
 
-void ui_LedColor_update_color(uint16_t hue)
+void ui_LedColor_update_color(int16_t hue_delta)
 {
     lv_color_hsv_t h_color=lv_colorwheel_get_hsv(ui_LedColorWheel);
-    h_color.h = ((hue%360) - 1);
+    int16_t new_hue = h_color.h + hue_delta;
+    if (new_hue < 0)
+        new_hue = (new_hue % 360 + 360) % 360;
+    else
+        new_hue = new_hue % 360;
+    h_color.h = new_hue;
     lv_color_t color = lv_color_hsv_to_rgb(h_color.h, h_color.s, h_color.v);
     lv_colorwheel_set_rgb(ui_LedColorWheel, color);
+    lv_obj_invalidate(ui_LedColorWheel);
 }

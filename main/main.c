@@ -348,15 +348,13 @@ static void haptic_feedback_short(void)
 static void encoder_task(void *arg)
 {
     ESP_LOGI(TAG, "Starting encoder task");
-    counter_value=0;
     while (1) {
         EventBits_t events = xEventGroupWaitBits(knob_even_, 0x07, pdTRUE, pdFALSE, pdMS_TO_TICKS(100));
         
 #ifdef LOCAL_UI
     if (events & 0x01)
     {
-        counter_value++;
-        haptic_feedback_short();
+        //haptic_feedback_short();
         if (lv_scr_act() == ui_Menu)
         {
             lv_roller_set_selected (ui_MenuRoller, (lv_roller_get_selected (ui_MenuRoller) - 1), LV_ANIM_ON);
@@ -364,24 +362,22 @@ static void encoder_task(void *arg)
 
         if (lv_scr_act() == ui_LedColor)
         {
-            ui_LedColor_update_color(counter_value);
+            ESP_LOGI(TAG, "CCW rotation detected");
+            ui_LedColor_update_color(10);
         }
     }
-    else
+    if (events & 0x02)
     {
-        if (events & 0x02)
+        //haptic_feedback_short();
+        if (lv_scr_act() == ui_Menu)
         {
-            counter_value--;
-            haptic_feedback_short();
-            if (lv_scr_act() == ui_Menu)
-            {
-                lv_roller_set_selected (ui_MenuRoller, (lv_roller_get_selected (ui_MenuRoller) + 1), LV_ANIM_ON);
-            }
+            lv_roller_set_selected (ui_MenuRoller, (lv_roller_get_selected (ui_MenuRoller) + 1), LV_ANIM_ON);
+        }
 
-            if (lv_scr_act() == ui_LedColor)
-            {
-                ui_LedColor_update_color(counter_value);
-            }
+        if (lv_scr_act() == ui_LedColor)
+        {
+            ESP_LOGI(TAG, "CW rotation detected");
+            ui_LedColor_update_color(-10);
         }
     }
 #endif

@@ -8,7 +8,7 @@
 
 static const char *TAG = "counter";
 
-void OpenClock(lv_event_t * e)
+void OpenLedScreen(lv_event_t * e)
 {
 	lv_obj_t *roller = lv_event_get_target(e);
 

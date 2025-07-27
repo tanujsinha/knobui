@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void OpenClock(lv_event_t * e);
+void OpenLedScreen(lv_event_t * e);
 void ReturnToMenu(lv_event_t * e);
 
 #ifdef __cplusplus

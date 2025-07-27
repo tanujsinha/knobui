@@ -59,3 +59,11 @@ void ui_LedColor_screen_destroy(void)
     ui_BackButtonLed = NULL;
 
 }
+
+void ui_LedColor_update_color(uint16_t hue)
+{
+    lv_color_hsv_t h_color=lv_colorwheel_get_hsv(ui_LedColorWheel);
+    h_color.h = ((hue%360) - 1);
+    lv_color_t color = lv_color_hsv_to_rgb(h_color.h, h_color.s, h_color.v);
+    lv_colorwheel_set_rgb(ui_LedColorWheel, color);
+}

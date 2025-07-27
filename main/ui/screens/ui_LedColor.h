@@ -13,6 +13,7 @@ extern "C" {
 // SCREEN: ui_LedColor
 extern void ui_LedColor_screen_init(void);
 extern void ui_LedColor_screen_destroy(void);
+extern void ui_LedColor_update_color(uint16_t hue);
 extern lv_obj_t * ui_LedColor;
 extern lv_obj_t * ui_LedColorWheel;
 extern void ui_event_BackButtonLed(lv_event_t * e);

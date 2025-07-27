@@ -1824,10 +1824,43 @@ static void update_counter_display(void)
 static void encoder_task(void *arg)
 {
     ESP_LOGI(TAG, "Starting encoder task");
-    
+    counter_value=0;
     while (1) {
         EventBits_t events = xEventGroupWaitBits(knob_even_, 0x07, pdTRUE, pdFALSE, pdMS_TO_TICKS(100));
         
+#ifdef LOCAL_UI
+    if (events & 0x01)
+    {
+        counter_value++;
+        if (lv_scr_act() == ui_Menu)
+        {
+            lv_roller_set_selected (ui_MenuRoller, (lv_roller_get_selected (ui_MenuRoller) - 1), LV_ANIM_ON);
+        }
+
+        if (lv_scr_act() == ui_LedColor)
+        {
+            ESP_LOGI(TAG, "Move direction left decreament");
+            ui_LedColor_update_color(counter_value);
+        }
+    }
+    else
+    {
+        if (events & 0x02)
+        {
+            counter_value--;
+            if (lv_scr_act() == ui_Menu)
+            {
+                lv_roller_set_selected (ui_MenuRoller, (lv_roller_get_selected (ui_MenuRoller) + 1), LV_ANIM_ON);
+            }
+
+            if (lv_scr_act() == ui_LedColor)
+            {
+                ESP_LOGI(TAG, "Move direction right increament");
+                ui_LedColor_update_color(counter_value);
+            }
+        }
+    }
+#else
         // Handle encoder button press (0x04)
         if (events & 0x04) {
             if (main_menu_open) {
@@ -2026,6 +2059,7 @@ static void encoder_task(void *arg)
             
             example_lvgl_unlock();
         }
+#endif
     }
 }
 

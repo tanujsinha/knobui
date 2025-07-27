@@ -40,9 +40,6 @@ extern lv_anim_t * heart_Animation(lv_obj_t * TargetObject, int delay);
 
 extern lv_obj_t * ui____initial_actions0;
 
-// IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_arrow_png);    // assets/arrow.png
-
 // FONTS
 LV_FONT_DECLARE(ui_font_H1);
 LV_FONT_DECLARE(ui_font_Number_big);

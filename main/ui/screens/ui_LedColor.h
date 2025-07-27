@@ -18,6 +18,7 @@ extern lv_obj_t * ui_LedColor;
 extern lv_obj_t * ui_LedColorWheel;
 extern void ui_event_BackButtonLed(lv_event_t * e);
 extern lv_obj_t * ui_BackButtonLed;
+extern lv_obj_t * ui_ButtonName;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

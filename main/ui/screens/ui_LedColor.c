@@ -8,6 +8,7 @@
 lv_obj_t * ui_LedColor = NULL;
 lv_obj_t * ui_LedColorWheel = NULL;
 lv_obj_t * ui_BackButtonLed = NULL;
+lv_obj_t * ui_ButtonName = NULL;
 // event funtions
 void ui_event_BackButtonLed(lv_event_t * e)
 {
@@ -33,17 +34,33 @@ void ui_LedColor_screen_init(void)
     lv_obj_set_align(ui_LedColorWheel, LV_ALIGN_CENTER);
     lv_obj_set_style_arc_width(ui_LedColorWheel, 30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    lv_obj_set_style_border_width(ui_LedColorWheel, 1, LV_PART_KNOB | LV_STATE_DEFAULT);
+
     ui_BackButtonLed = lv_btn_create(ui_LedColor);
-    lv_obj_set_width(ui_BackButtonLed, 30);
-    lv_obj_set_height(ui_BackButtonLed, 30);
+    lv_obj_set_width(ui_BackButtonLed, 250);
+    lv_obj_set_height(ui_BackButtonLed, 250);
     lv_obj_set_align(ui_BackButtonLed, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_BackButtonLed, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_BackButtonLed, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_BackButtonLed, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_BackButtonLed, 180, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_BackButtonLed, lv_color_hex(0x272727), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BackButtonLed, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui_BackButtonLed, &ui_img_arrow_png, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_recolor(ui_BackButtonLed, lv_color_hex(0x565656), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_recolor_opa(ui_BackButtonLed, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_ButtonName = lv_textarea_create(ui_BackButtonLed);
+    lv_obj_set_width(ui_ButtonName, 123);
+    lv_obj_set_height(ui_ButtonName, 52);
+    lv_obj_set_align(ui_ButtonName, LV_ALIGN_CENTER);
+    lv_textarea_set_max_length(ui_ButtonName, 0);
+    lv_textarea_set_text(ui_ButtonName, "Back");
+    lv_textarea_set_placeholder_text(ui_ButtonName, "Placeholder...");
+    lv_obj_clear_flag(ui_ButtonName, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
+                      LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE);     /// Flags
+    lv_obj_set_style_text_align(ui_ButtonName, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_ButtonName, &lv_font_montserrat_48, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_ButtonName, lv_color_hex(0x202420), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ButtonName, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_BackButtonLed, ui_event_BackButtonLed, LV_EVENT_ALL, NULL);
 
@@ -57,6 +74,7 @@ void ui_LedColor_screen_destroy(void)
     ui_LedColor = NULL;
     ui_LedColorWheel = NULL;
     ui_BackButtonLed = NULL;
+    ui_ButtonName = NULL;
 
 }
 

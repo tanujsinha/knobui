@@ -303,7 +303,7 @@
                       {
                         "nid": 1000008,
                         "strtype": "CALL FUNCTION/Function_name",
-                        "strval": "OpenClock",
+                        "strval": "OpenLedScreen",
                         "InheritedType": 10
                       },
                       {
@@ -3938,7 +3938,7 @@
     "rotation": 0,
     "offset_x": 0,
     "offset_y": 0,
-    "shape": "RECTANGLE",
+    "shape": "CIRCLE",
     "multilang": "DISABLE",
     "description": "In this exemplary project, you will discover how to craft a modern and visually captivating smartwatch UI. Learn the intricacies of designing an intuitive interface that enhances user experience and functionality.",
     "board": "Eclipse with SDL for development on PC",

@@ -24,6 +24,12 @@
 #include "user_encoder_bsp.h"
 #include "i2c_equipment.h"
 
+#include "esp_event.h"
+#include "esp_wifi.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "nvs_flash.h"
+
 #ifdef LOCAL_UI
 #include "ui/ui.h"
 #endif
@@ -334,6 +340,27 @@ static void example_lvgl_unlock(void)
     xSemaphoreGive(lvgl_mux);
 }
 
+void wifi_init_sta(void) {
+    esp_netif_init();
+    esp_event_loop_create_default();
+    esp_netif_create_default_wifi_sta();
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    esp_wifi_init(&cfg);
+
+    wifi_config_t wifi_config = {
+        .sta = {
+            .ssid = WIFI_SSID,
+            .password = WIFI_PASS,
+        },
+    };
+
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+    esp_wifi_start();
+
+    esp_wifi_connect();
+}
 
 // Haptic feedback function
 static void haptic_feedback_short(void)
@@ -362,7 +389,7 @@ static void encoder_task(void *arg)
 
         if (lv_scr_act() == ui_LedColor)
         {
-            ESP_LOGI(TAG, "CCW rotation detected");
+            //ESP_LOGI(TAG, "CCW rotation detected");
             ui_LedColor_update_color(10);
         }
     }
@@ -376,7 +403,7 @@ static void encoder_task(void *arg)
 
         if (lv_scr_act() == ui_LedColor)
         {
-            ESP_LOGI(TAG, "CW rotation detected");
+            //ESP_LOGI(TAG, "CW rotation detected");
             ui_LedColor_update_color(-10);
         }
     }
@@ -533,6 +560,16 @@ void app_main(void)
 #ifdef Backlight_Testing
     xTaskCreate(example_backlight_test_task, "backlight", 3 * 1024, NULL, 2, NULL);
 #endif
+
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
+    wifi_init_sta();
+
     ESP_LOGI(TAG, "=== BUILDING CUSTOM COUNTER APPLICATION ===");
     ESP_LOGI(TAG, "Create counter UI");
     // Lock the mutex due to the LVGL APIs are not thread-safe

@@ -6,3 +6,7 @@ def ReturnToMenu(event_struct):
 def OpenClock(event_struct):
     return
 
+
+def OpenLedScreen(event_struct):
+    return
+

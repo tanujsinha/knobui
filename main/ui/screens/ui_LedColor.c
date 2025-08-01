@@ -5,6 +5,9 @@
 
 #include "../ui.h"
 #include <stdio.h>
+#include "mqtt_client.h"
+#include "esp_err.h"
+#include "esp_log.h"
 
 lv_obj_t * ui_LedColor = NULL;
 lv_obj_t * ui_LedColorWheel = NULL;
@@ -79,16 +82,90 @@ void ui_LedColor_screen_destroy(void)
 
 }
 
+// void lv_color_to_rgb_string(lv_color_t color, char *out_str, size_t size) {
+//     // Extract 5-bit red and blue, 6-bit green from bitfields (RGB565)
+//     uint16_t value = color.full;
+//     uint8_t red_5bit   = (value >> 11) & 0x1F;
+//     uint8_t green_6bit = (value >> 5)  & 0x3F;
+//     uint8_t blue_5bit  = value & 0x1F;
+
+//     // Bit expansion for more accurate 8-bit conversion
+//     uint8_t red_8bit   = (red_5bit << 3) | (red_5bit >> 2);
+//     uint8_t green_8bit = (green_6bit << 2) | (green_6bit >> 4);
+//     uint8_t blue_8bit  = (blue_5bit << 3) | (blue_5bit >> 2);
+
+//     // Format string as "#RRGGBB"
+//     snprintf(out_str, size, "#%02X%02X%02X", red_8bit, green_8bit, blue_8bit);
+// }
+
+// void ui_LedColor_update_color(int16_t hue_delta)
+// {
+//     lv_color_hsv_t h_color=lv_colorwheel_get_hsv(ui_LedColorWheel);
+//     int16_t new_hue = h_color.h + hue_delta;
+//     if (new_hue < 0)
+//         new_hue = (new_hue % 360 + 360) % 360;
+//     else
+//         new_hue = new_hue % 360;
+//     h_color.h = new_hue;
+//     lv_color_t color = lv_color_hsv_to_rgb(h_color.h, h_color.s, h_color.v);
+//     lv_colorwheel_set_rgb(ui_LedColorWheel, color);
+//     color = lv_colorwheel_get_rgb(ui_LedColorWheel);
+//     char rgb_str[16]={'\0'};
+//     lv_color_to_rgb_string(color, rgb_str, sizeof(rgb_str));
+//     ESP_LOGI("LED_COLOR", "Setting LED color to: %s", rgb_str);
+//     updateLedColor(rgb_str);
+//     lv_obj_invalidate(ui_LedColorWheel);
+// }
+
+
+static void hsv_to_rgb888(uint16_t h, uint8_t s, uint8_t v, uint8_t *r, uint8_t *g, uint8_t *b) {
+    // Increase intensity by 20%
+    float intensity_factor = 1.2f;
+    float v_scaled = v * intensity_factor;
+    if (v_scaled > 255.0f) v_scaled = 255.0f;
+
+    float hf = h / 60.0f;
+    int i = (int)hf;
+    float f = hf - i;
+    float pv = v_scaled * (1 - s / 255.0f);
+    float qv = v_scaled * (1 - s / 255.0f * f);
+    float tv = v_scaled * (1 - s / 255.0f * (1 - f));
+
+    switch(i) {
+        default:
+        case 0: *r = (uint8_t)v_scaled; *g = (uint8_t)tv; *b = (uint8_t)pv; break;
+        case 1: *r = (uint8_t)qv; *g = (uint8_t)v_scaled; *b = (uint8_t)pv; break;
+        case 2: *r = (uint8_t)pv; *g = (uint8_t)v_scaled; *b = (uint8_t)tv; break;
+        case 3: *r = (uint8_t)pv; *g = (uint8_t)qv; *b = (uint8_t)v_scaled; break;
+        case 4: *r = (uint8_t)tv; *g = (uint8_t)pv; *b = (uint8_t)v_scaled; break;
+        case 5: *r = (uint8_t)v_scaled; *g = (uint8_t)pv; *b = (uint8_t)qv; break;
+    }
+}
+
 void ui_LedColor_update_color(int16_t hue_delta)
 {
-    lv_color_hsv_t h_color=lv_colorwheel_get_hsv(ui_LedColorWheel);
-    int16_t new_hue = h_color.h + hue_delta;
+    // Get HSV from color wheel
+    lv_color_hsv_t hsv=lv_colorwheel_get_hsv(ui_LedColorWheel);
+    int16_t new_hue = hsv.h + hue_delta;
     if (new_hue < 0)
         new_hue = (new_hue % 360 + 360) % 360;
     else
         new_hue = new_hue % 360;
-    h_color.h = new_hue;
-    lv_color_t color = lv_color_hsv_to_rgb(h_color.h, h_color.s, h_color.v);
-    lv_colorwheel_set_rgb(ui_LedColorWheel, color);
+    hsv.h = new_hue;
+
+    // Set color wheel to new HSV
+    lv_color_t rgb_color = lv_color_hsv_to_rgb(hsv.h, hsv.s, hsv.v);
+    lv_colorwheel_set_rgb(ui_LedColorWheel, rgb_color);
+
+    // Convert HSV directly to RGB888 for WLED
+    uint8_t r, g, b;
+    hsv_to_rgb888(hsv.h, hsv.s, hsv.v, &r, &g, &b);
+
+    char rgb_str[8]={'\0'};
+    snprintf(rgb_str, sizeof(rgb_str), "#%02X%02X%02X", r, g, b);
+
+    ESP_LOGI("LED_COLOR", "Setting LED color to: %s", rgb_str);
+    updateLedColor(rgb_str);
+
     lv_obj_invalidate(ui_LedColorWheel);
 }

@@ -5,8 +5,41 @@
 
 #include "ui.h"
 #include "i2c_equipment.h"
+#include "mqtt_client.h"
+#include "esp_err.h"
+#include "esp_log.h"
 
 static const char *TAG = "counter";
+
+static const char *MQTT_TAG = "MQTT_HOME";
+static esp_mqtt_client_handle_t mqtt_client = NULL;
+
+static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
+    esp_mqtt_event_handle_t event = event_data;
+    esp_mqtt_client_handle_t client = event->client;
+
+    switch ((esp_mqtt_event_id_t)event_id) {
+        case MQTT_EVENT_CONNECTED:
+            ESP_LOGI(MQTT_TAG, "MQTT connected");
+            //esp_mqtt_client_publish(client, "/esp32/test", "hello mqtt", 0, 1, 0);
+            break;
+        default:
+            break;
+    }
+}
+
+void updateLedColor(char *color) {
+	esp_mqtt_client_publish(mqtt_client, "wled/livingroom/col", color, strlen(color), 1, 0);
+}
+
+void mqtt_app_start(void) {
+    esp_mqtt_client_config_t mqtt_cfg = {};
+    mqtt_cfg.broker.address.uri = "mqtt://192.168.100.5:1883";
+    mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
+    esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+    esp_mqtt_client_start(mqtt_client);
+}
+
 
 void OpenLedScreen(lv_event_t * e)
 {
@@ -17,6 +50,7 @@ void OpenLedScreen(lv_event_t * e)
 	switch(selected_index)
 	{
 		case 0:
+			mqtt_app_start();
 			break;
 		case 1:
 			lv_disp_load_scr( ui_LedColor);
@@ -26,8 +60,6 @@ void OpenLedScreen(lv_event_t * e)
 		default:
 			break;
 	}
-	
-	// Your code here
 }
 
 void ReturnToMenu(lv_event_t * e)

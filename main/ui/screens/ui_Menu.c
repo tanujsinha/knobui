@@ -27,7 +27,7 @@ void ui_Menu_screen_init(void)
     lv_obj_set_style_bg_opa(ui_Menu, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_MenuRoller = lv_roller_create(ui_Menu);
-    lv_roller_set_options(ui_MenuRoller, "Clock\nLighting\nEmpty 1\nEmpty 2\nEmpty 3\nEmpty 4", LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_options(ui_MenuRoller, "MQTT\nLighting\nEmpty 1\nEmpty 2\nEmpty 3\nEmpty 4", LV_ROLLER_MODE_INFINITE);
     lv_obj_set_height(ui_MenuRoller, 155);
     lv_obj_set_width(ui_MenuRoller, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_align(ui_MenuRoller, LV_ALIGN_CENTER);

@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+void updateLedColor(char *color);
+void mqtt_app_start(void);
 void OpenLedScreen(lv_event_t * e);
 void ReturnToMenu(lv_event_t * e);
 

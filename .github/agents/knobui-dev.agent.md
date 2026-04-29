@@ -1,6 +1,6 @@
 ---
 description: "Use when: developing, debugging, or modifying the ESP32-S3 Knob Touch LCD project. Handles ESP-IDF firmware, LVGL UI, hardware BSP components, SquareLine Studio integration, peripheral drivers (DRV2605 haptic, CST816 touch, rotary encoder, SH8601 LCD), FreeRTOS tasks, GPIO pin configuration, sdkconfig tuning, build/flash workflows, and component architecture."
-name: "ESP32-S3 Knob Dev"
+name: "Knobui-Dev"
 tools: [read, edit, search, execute, todo]
 argument-hint: "Describe the firmware feature, hardware peripheral, or UI screen you want to work on."
 ---

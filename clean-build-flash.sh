@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Flash the ESP32-S3 Knob project to the connected device
+# Full clean, rebuild, and flash for the ESP32-S3 Knob project
 set -e
 
 PORT="${1:-/dev/cu.usbmodem1101}"
@@ -10,10 +10,19 @@ export PATH="$HOME/.espressif/python_env/idf5.3_py3.9_env/bin:$PATH"
 source ~/esp/esp-idf/export.sh > /dev/null 2>&1 || true
 export IDF_PYTHON_ENV_PATH="$HOME/.espressif/python_env/idf5.3_py3.9_env"
 
-echo "=== Flashing to $PORT at ${BAUD} baud ==="
 cd "$(dirname "$0")"
+
+echo "=== Cleaning managed components ==="
+rm -rf managed_components/
+
+echo "=== Full clean ==="
+idf.py fullclean
+
+echo "=== Building ==="
+idf.py build
+
+echo "=== Flashing to $PORT at ${BAUD} baud ==="
 idf.py -p "$PORT" -b "$BAUD" flash
 
 echo ""
-echo "=== Flash complete! Device is rebooting. ==="
-echo "Run: idf.py -p $PORT monitor   (to view serial output)"
+echo "=== Done! Device is running new firmware. ==="

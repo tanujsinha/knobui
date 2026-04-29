@@ -3,6 +3,9 @@ build/
 sdkconfig
 sdkconfig.old
 
+# Auto-downloaded managed components (fetched by idf-component-manager at build time)
+managed_components/
+
 # VS Code settings (keep tasks and launch configs)
 .vscode/c_cpp_properties.json
 

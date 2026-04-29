@@ -1,6 +1,7 @@
 {
   "C_Cpp.errorSquiggles": "disabled",
   "idf.portWin": "COM7",
+  "idf.port": "/dev/cu.usbmodem1101",
   "files.associations": {
     "user_encoder_bsp.h": "c",
     "lcd_touch_bsp.h": "c",
@@ -16,6 +17,9 @@
   "idf.espIdfPathWin": "c:\\Users\\Admin\\Downloads\\esp\\container\\v5.5\\esp-idf",
   "idf.toolsPathWin": "c:\\Users\\Admin\\Downloads\\esp\\tools",
   "idf.pythonInstallPath": "c:\\Users\\Admin\\Downloads\\esp\\tools\\tools\\idf-python\\3.11.2\\python.exe",
+  "idf.espIdfPath": "/Users/tanuj/esp/esp-idf",
+  "idf.toolsPath": "/Users/tanuj/.espressif",
+  "idf.pythonBinPath": "/Users/tanuj/.espressif/python_env/idf5.3_py3.9_env/bin/python",
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
   "git.autofetch": true,
@@ -41,5 +45,7 @@
     "--compile-commands-dir=c:\\Users\\Admin\\Downloads\\swubasedatapad-main\\build"
   ],
   "idf.flashType": "UART",
-  "idf.monitorPort": "COM7"
+  "idf.monitorPort": "COM7",
+  "idf.adapterTargetName": "esp32s3",
+  "idf.svdFilePath": ""
 }

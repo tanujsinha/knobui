@@ -4,8 +4,8 @@
         {
             "label": "ESP-IDF: Build",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["build"],
+            "command": "${workspaceFolder}/build.sh",
+            "args": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -21,19 +21,15 @@
         {
             "label": "ESP-IDF: Clean",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["clean"],
+            "command": "export PATH='/opt/homebrew/opt/python@3.11/libexec/bin:$PATH' && source ~/esp/esp-idf/export.sh > /dev/null 2>&1 && export PATH="$HOME/.espressif/python_env/idf5.3_py3.9_env/bin:$PATH" && idf.py fullclean",
             "group": "build",
             "problemMatcher": []
         },
         {
-            "label": "ESP-IDF: Flash (Reliable)",
+            "label": "ESP-IDF: Flash",
             "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy", "Bypass",
-                "-File", "${workspaceFolder}\\flash-fix.ps1"
-            ],
+            "command": "${workspaceFolder}/flash.sh",
+            "args": [],
             "group": "build",
             "presentation": {
                 "echo": true,
@@ -46,10 +42,8 @@
         {
             "label": "ESP-IDF: Flash Low Baud",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["-b", "115200", "flash"],
+            "command": "${workspaceFolder}/flash.sh /dev/cu.usbmodem1101 115200",
             "group": "build",
-            "dependsOn": "ESP-IDF: Build",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -59,19 +53,23 @@
             "problemMatcher": []
         },
         {
-            "label": "ESP-IDF: Flash",
+            "label": "ESP-IDF: Build and Flash",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["flash"],
+            "command": "${workspaceFolder}/build-flash.sh",
+            "args": [],
             "group": "build",
-            "dependsOn": "ESP-IDF: Build",
-            "problemMatcher": []
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": ["$espIdf"]
         },
         {
             "label": "ESP-IDF: Monitor",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["monitor"],
+            "command": "export PATH='/opt/homebrew/opt/python@3.11/libexec/bin:$PATH' && source ~/esp/esp-idf/export.sh > /dev/null 2>&1 && export PATH="$HOME/.espressif/python_env/idf5.3_py3.9_env/bin:$PATH" && idf.py -p /dev/cu.usbmodem1101 monitor",
             "group": "test",
             "isBackground": true,
             "problemMatcher": []
@@ -79,39 +77,29 @@
         {
             "label": "ESP-IDF: Flash and Monitor",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["flash", "monitor"],
+            "command": "${workspaceFolder}/build-flash.sh && export PATH='/opt/homebrew/opt/python@3.11/libexec/bin:$PATH' && source ~/esp/esp-idf/export.sh > /dev/null 2>&1 && export PATH="$HOME/.espressif/python_env/idf5.3_py3.9_env/bin:$PATH" && idf.py -p /dev/cu.usbmodem1101 monitor",
             "group": "build",
-            "dependsOn": "ESP-IDF: Build",
             "isBackground": true,
             "problemMatcher": []
         },
         {
             "label": "ESP-IDF: Set Target ESP32-S3",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["set-target", "esp32s3"],
+            "command": "export PATH='/opt/homebrew/opt/python@3.11/libexec/bin:$PATH' && source ~/esp/esp-idf/export.sh > /dev/null 2>&1 && export PATH="$HOME/.espressif/python_env/idf5.3_py3.9_env/bin:$PATH" && idf.py set-target esp32s3",
             "group": "build",
             "problemMatcher": []
         },
         {
             "label": "ESP-IDF: Menuconfig",
             "type": "shell",
-            "command": "idf.py",
-            "args": ["menuconfig"],
+            "command": "export PATH='/opt/homebrew/opt/python@3.11/libexec/bin:$PATH' && source ~/esp/esp-idf/export.sh > /dev/null 2>&1 && export PATH="$HOME/.espressif/python_env/idf5.3_py3.9_env/bin:$PATH" && idf.py menuconfig",
             "group": "build",
             "problemMatcher": []
         },
         {
             "label": "Git: Quick Update",
             "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-Command",
-                "$msg = Read-Host 'Enter commit message'; if($msg) { git add .; git commit -m \"$msg - $(Get-Date -Format 'yyyy-MM-dd HH:mm')\"; git push; Write-Host '✅ Updated GitHub!' -ForegroundColor Green } else { Write-Host '❌ No message provided' -ForegroundColor Red }"
-            ],
+            "command": "msg=$(read -p 'Enter commit message: ' m && echo $m); if [ -n \"$msg\" ]; then git add . && git commit -m \"$msg - $(date '+%Y-%m-%d %H:%M')\" && git push && echo 'Updated GitHub!'; else echo 'No message provided'; fi",
             "group": "build",
             "presentation": {
                 "echo": true,
